@@ -99,6 +99,14 @@ prisma/
 ### Nome da loja
 - **GRAFITE**, papelaria fina. Logo: `GRAFITE` em caixa alta com letter-spacing largo.
 
+## Próximos passos (atualizado em 2026-09-14)
+
+1. **11** `ActionResult` e toasts (Claude), que libera o **03**.
+2. **03** `/design-system` (Claude).
+3. **12** Headers de segurança (Claude).
+4. **14** Casos de borda de `formatPrice` (Gustavo), em paralelo. Revisar quando ele avisar.
+5. **15** Deploy (Gustavo), quando tudo acima estiver `resolved`.
+
 ## Tickets
 
 | # | Ticket | Responsável | Bloqueado por |
