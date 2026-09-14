@@ -1,6 +1,6 @@
 # 10 - Prisma + Supabase + `/api/health`
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 09
 

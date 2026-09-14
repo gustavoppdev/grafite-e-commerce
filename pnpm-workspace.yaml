@@ -1,3 +1,7 @@
 allowBuilds:
+  # Baixa o schema engine oficial (binaries.prisma.sh), usado por `prisma migrate`.
+  '@prisma/engines': true
+  # Só verifica versão de Node/ambiente antes de instalar.
+  prisma: true
   sharp: false
   unrs-resolver: false

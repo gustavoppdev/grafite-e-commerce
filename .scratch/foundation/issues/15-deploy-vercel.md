@@ -2,7 +2,7 @@
 
 Status: open
 Responsável: Gustavo
-Blocked by: 05, 07, 10, 12, 14
+Blocked by: 05, 07, 10, 12, 14, 17
 
 ## O que
 

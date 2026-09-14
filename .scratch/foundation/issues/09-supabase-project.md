@@ -1,6 +1,6 @@
 # 09 - Criar projeto no Supabase e preencher `.env`
 
-Status: in-review
+Status: resolved
 Responsável: Gustavo
 Blocked by: 08
 

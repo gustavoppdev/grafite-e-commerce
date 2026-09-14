@@ -1,0 +1,13 @@
+// Prisma 7: as URLs de conexão não ficam mais aqui, e sim em prisma.config.ts (CLI)
+// e em src/lib/prisma.ts (aplicação, via adaptador).
+
+generator client {
+  provider = "prisma-client"
+  // Gerado dentro de src/ para ser importado como `@/generated/prisma/client`.
+  // É código gerado: fica fora do git e é recriado por `pnpm db:generate` / postinstall.
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
