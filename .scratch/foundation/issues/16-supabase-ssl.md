@@ -1,6 +1,6 @@
 # 16 - Certificado SSL do Supabase e SSL obrigatório
 
-Status: open
+Status: resolved
 Responsável: Gustavo
 Blocked by: 10
 

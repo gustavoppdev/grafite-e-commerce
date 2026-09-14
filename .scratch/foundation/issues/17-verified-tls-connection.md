@@ -1,6 +1,6 @@
 # 17 - Conexão TLS verificada com o banco
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 16
 

@@ -76,7 +76,7 @@ prisma/
 - Supabase só como Postgres. Duas URLs: **pooler (transaction mode)** para a aplicação em runtime/serverless e **conexão direta/session** para migrations.
 - Cliente Prisma único (singleton) em `src/lib/prisma.ts` com `server-only`, evitando múltiplas conexões no hot reload.
 - Prisma 7.10 com `@prisma/adapter-pg`. A URL do pooler **não** precisa de `?pgbouncer=true`: testado com 900 consultas parametrizadas simultâneas pelo transaction pooler, sem erro (ticket 10).
-- A conexão precisa de TLS **verificado** com o certificado raiz do Supabase (tickets 16 e 17). Sem configuração, o driver conecta sem criptografia.
+- TLS **verificado** com a CA do Supabase (`certs/supabase-ca.crt`, pública) na aplicação e na CLI; SSL obrigatório ativo no projeto (tickets 16 e 17).
 - `GET /api/health` executa `SELECT 1` e responde `{ status: "ok" }` ou `503 { status: "error" }`, **sem expor a mensagem de erro**.
 
 ### Segurança

@@ -8,6 +8,12 @@ parseServerEnv(process.env);
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  // Na Vercel cada rota vira uma função que só recebe os arquivos que o Next detecta
+  // como usados. Um arquivo lido com `readFileSync` pode passar despercebido, então
+  // incluímos a CA do banco explicitamente em todas as rotas.
+  outputFileTracingIncludes: {
+    "/**": ["./certs/supabase-ca.crt"],
+  },
 };
 
 export default nextConfig;

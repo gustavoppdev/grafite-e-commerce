@@ -1,4 +1,6 @@
 import "server-only";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
 import { env } from "./env";
@@ -13,11 +15,33 @@ import { env } from "./env";
   Em produção os módulos carregam uma vez só, então não é necessário.
 */
 
+/*
+  TLS com validação do servidor.
+
+  Sem `ssl`, o driver `pg` conecta em texto puro: senha e dados trafegam legíveis.
+  Só ligar a criptografia não basta: sem VALIDAR o certificado, um atacante no meio
+  do caminho (man-in-the-middle) pode apresentar um certificado próprio, e o cliente
+  aceita. Por isso nunca usamos `rejectUnauthorized: false`.
+
+  O certificado do Supabase é assinado pela autoridade (CA) do próprio Supabase, que não
+  vem instalada no sistema. Passamos essa CA em `ca`: o driver só aceita um servidor cujo
+  certificado tenha sido assinado por ela. O arquivo é público (não é segredo) e foi
+  baixado pelo painel do Supabase. O `outputFileTracingIncludes` do next.config garante
+  que ele seja copiado junto com as funções na Vercel.
+*/
+const supabaseCa = readFileSync(
+  join(process.cwd(), "certs", "supabase-ca.crt"),
+  "utf8",
+);
+
 function createPrismaClient() {
   // No Prisma 7 a conexão passa por um adaptador do driver `pg`. A aplicação usa a
   // DATABASE_URL: o pooler do Supabase, que aguenta muitas funções serverless abrindo
   // conexões ao mesmo tempo.
-  const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
+  const adapter = new PrismaPg({
+    connectionString: env.DATABASE_URL,
+    ssl: { ca: supabaseCa },
+  });
   return new PrismaClient({ adapter });
 }
 

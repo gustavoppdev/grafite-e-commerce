@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { loadEnvConfig } from "@next/env";
 import { defineConfig } from "prisma/config";
 
@@ -5,20 +6,38 @@ import { defineConfig } from "prisma/config";
 // a CLI do Prisma e o app enxergam exatamente as mesmas variáveis.
 loadEnvConfig(process.cwd());
 
+/*
+  A CLI (migrate, studio) usa um motor próprio, com parâmetros de SSL diferentes do
+  driver `pg` da aplicação. Testado no ticket 17:
+  - `sslmode=verify-full&sslrootcert=...` (padrão do PostgreSQL) é IGNORADO: conecta
+    até com a CA errada. Parece seguro e não é.
+  - `sslmode=require&sslcert=<CA>&sslaccept=strict` valida o certificado de verdade.
+  Os parâmetros são adicionados aqui para o .env continuar com a URL simples do painel.
+*/
+function withVerifiedTls(url: string | undefined) {
+  if (!url) {
+    // Na Vercel o `prisma generate` roda na instalação e não precisa de banco,
+    // então a DIRECT_URL nem existe lá.
+    return "";
+  }
+  const withTls = new URL(url);
+  withTls.searchParams.set("sslmode", "require");
+  withTls.searchParams.set(
+    "sslcert",
+    join(process.cwd(), "certs", "supabase-ca.crt"),
+  );
+  withTls.searchParams.set("sslaccept", "strict");
+  return withTls.toString();
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    /*
-      Esta URL é só da CLI (migrate, studio). Migrations precisam da conexão DIRETA:
-      o pooler em transaction mode reaproveita a mesma conexão entre clientes
-      diferentes e não suporta os comandos que uma migration executa.
-
-      `?? ""` em vez de exigir a variável: na Vercel o `prisma generate` roda na
-      instalação e não precisa de banco, então a DIRECT_URL nem existe lá.
-    */
-    url: process.env.DIRECT_URL ?? "",
+    // Migrations precisam da conexão DIRETA: o pooler em transaction mode reaproveita
+    // a mesma conexão entre clientes diferentes e não suporta o que uma migration executa.
+    url: withVerifiedTls(process.env.DIRECT_URL),
   },
 });
