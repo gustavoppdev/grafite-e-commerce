@@ -1,0 +1,3 @@
+# Authorization is enforced where data is read and written, not in proxy.ts
+
+`proxy.ts` (formerly `middleware.ts`) redirects signed-out Visitors and non-Admins away from protected routes, but only as a convenience. Every page, server action and data query that touches protected data checks the session and role again itself (e.g. `requireUser()` / `requireAdmin()`) and scopes queries to the owner (a Customer only ever loads their own Orders, Cart and Addresses). This duplication is deliberate: the proxy can be bypassed (see CVE-2025-29927) and does not run for every code path, so it must never be the only line of defense.
