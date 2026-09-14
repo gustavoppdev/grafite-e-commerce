@@ -1,6 +1,6 @@
 # 02 - Tema, fonte e tokens visuais
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 01
 

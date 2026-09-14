@@ -1,16 +1,137 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #1c1b1b;
-}
+/*
+  Os componentes do shadcn trazem classes `dark:`. Por padrão o Tailwind ativa `dark:`
+  quando o sistema operacional está em modo escuro, o que misturaria estilos escuros
+  na nossa loja só-clara. Amarrando `dark:` a uma classe `.dark` que nunca usamos,
+  essas classes ficam inertes sem precisar editar cada componente.
+*/
+@custom-variant dark (&:is(.dark *));
 
+/*
+  `@theme inline` transforma variáveis CSS em utilitários do Tailwind:
+  `--color-muted` vira `bg-muted`, `text-muted`, `border-muted`...
+  Os valores reais ficam em `:root` abaixo. Componentes só conhecem os nomes
+  (tokens), nunca as cores, então mudar a paleta é mexer em um lugar só.
+*/
 @theme inline {
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-sans);
+
+  /* 13px para metadados (preço na listagem, breadcrumb, footer). Base do texto: 14px (`text-sm`). */
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.6;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-subtle-foreground: var(--subtle-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+/* Paleta adaptada de therow.com. Detalhes e contrastes em .scratch/foundation/spec.md. */
+:root {
+  --background: #ffffff;
+  /* Quase preto, não #000: preto puro sobre branco "vibra" e parece mais duro. */
+  --foreground: #1c1b1b;
+  --card: #ffffff;
+  --card-foreground: #1c1b1b;
+  --popover: #ffffff;
+  --popover-foreground: #1c1b1b;
+  --primary: #1c1b1b;
+  --primary-foreground: #ffffff;
+  --secondary: #f8f6f5;
+  --secondary-foreground: #1c1b1b;
+  /* Off-white quente: o placeholder de Produto (a loja não tem imagens). */
+  --muted: #f8f6f5;
+  /* Contraste 5.3:1 com o branco, passa no WCAG AA para texto. */
+  --muted-foreground: #6a6a6a;
+  /* Contraste 2.5:1: só para riscados/desabilitados, nunca texto que precisa ser lido. */
+  --subtle-foreground: #a5a3a3;
+  --accent: #f8f6f5;
+  --accent-foreground: #1c1b1b;
+  --destructive: #9f2d2d;
+  --border: #e8e6e5;
+  --input: #e8e6e5;
+  --ring: #1c1b1b;
+  --radius: 0rem;
+
+  --chart-1: #1c1b1b;
+  --chart-2: #6a6a6a;
+  --chart-3: #a5a3a3;
+  --chart-4: #d4d2d1;
+  --chart-5: #e8e6e5;
+  --sidebar: #f8f6f5;
+  --sidebar-foreground: #1c1b1b;
+  --sidebar-primary: #1c1b1b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #efedec;
+  --sidebar-accent-foreground: #1c1b1b;
+  --sidebar-border: #e8e6e5;
+  --sidebar-ring: #1c1b1b;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-sm text-foreground;
+  }
+
+  /*
+    Foco visível único para todo elemento interativo. Usamos `:focus-visible` (e não `:focus`)
+    para o contorno aparecer na navegação por teclado, mas não a cada clique do mouse.
+  */
+  :focus-visible {
+    outline: 1px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
