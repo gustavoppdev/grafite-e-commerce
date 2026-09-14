@@ -16,6 +16,10 @@ Cada feature é entregável sozinha e vai para produção (Vercel) ao terminar. 
 | 9 | Admin: Pedidos, Usuários e Dashboard | `admin-operations` | Transições de status, banir Cliente, Faturamento, Estoque baixo, agregações | pendente |
 | 10 | Fechamento | `wrap-up` | Playwright (cadastro → compra), revisão final de segurança | pendente |
 
+## Notas para features futuras
+
+- **Feature 4 (Catálogo):** `src/app/(store)/loading.tsx` faz toda página da loja responder em streaming, então `notFound()` (ex. Produto inexistente ou arquivado) devolve HTTP 200 + `noindex` em vez de 404. Ao criar as rotas de produto, mover o `loading.tsx` para a listagem e decidir se a página de Produto precisa de 404 real (verificado na Feature 0, ticket 07).
+
 ## Decisões transversais
 
 - Glossário: `CONTEXT.md`. Decisões: `docs/adr/`.

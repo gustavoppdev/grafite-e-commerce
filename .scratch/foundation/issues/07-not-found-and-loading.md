@@ -1,6 +1,6 @@
 # 07 - `not-found.tsx` e `loading.tsx`
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 06
 
