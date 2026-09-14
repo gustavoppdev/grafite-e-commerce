@@ -1,6 +1,6 @@
 # 04 - Header da loja
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 02
 
