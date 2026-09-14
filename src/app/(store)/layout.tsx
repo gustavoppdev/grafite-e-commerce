@@ -1,3 +1,4 @@
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 
 /*
@@ -19,9 +20,14 @@ export default function StoreLayout({ children }: LayoutProps<"/">) {
         Pular para o conteúdo
       </a>
       <SiteHeader />
+      {/*
+        O <body> é uma coluna flex com altura mínima da tela (layout raiz) e o <main>
+        cresce (`flex-1`) para ocupar a sobra: com pouco conteúdo, o footer continua no fim.
+      */}
       <main id="conteudo" className="flex flex-1 flex-col">
         {children}
       </main>
+      <SiteFooter />
     </>
   );
 }

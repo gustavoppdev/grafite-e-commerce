@@ -10,3 +10,10 @@ export const categoryLinks: NavLink[] = [
   { label: "Mesa", href: "/produtos?categoria=mesa" },
   { label: "Papéis", href: "/produtos?categoria=papeis" },
 ];
+
+// Rotas que as features de auth, pedidos e carrinho vão criar.
+export const accountLinks: NavLink[] = [
+  { label: "Entrar", href: "/entrar" },
+  { label: "Meus pedidos", href: "/conta/pedidos" },
+  { label: "Carrinho", href: "/carrinho" },
+];
