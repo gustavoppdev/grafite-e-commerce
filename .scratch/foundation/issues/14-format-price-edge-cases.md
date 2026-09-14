@@ -25,7 +25,8 @@ Casos a cobrir:
 
 - **Onde se inspirar:** o teste de exemplo em `src/lib/format.test.ts` (ticket 13). Mesmo `describe`, novos `it`.
 - **Primeiro escreva o teste, veja falhar, depois ajuste o código.** Para os casos 1-4 provavelmente não vai precisar mudar nada; para o caso 5, sim.
-- **Armadilha nº 1 (a mais comum):** o `Intl.NumberFormat` coloca um **espaço não separável** (` `) entre `R$` e o número, não um espaço normal. Seu teste com `"R$ 0,00"` vai falhar mesmo parecendo idêntico. Investigue: como você descobriria qual caractere é esse? E como escrever o valor esperado de forma legível?
+- **Espaço não separável:** o teste de exemplo já mostra que o `Intl` usa ` ` entre `R$` e o número. Se um teste seu falhar com uma mensagem do tipo `expected 'R$ 0,00' to be 'R$ 0,00'` (textos que parecem iguais), é isso. Pergunta extra: repetir ` ` em todo `expect` fica ilegível. Como você deixaria os valores esperados mais fáceis de ler sem enfraquecer o teste?
+- **Menos de 1 real e valores redondos:** confira o que o `Intl` faz com `5` centavos e com `10000` centavos antes de escrever o valor esperado. Não chute a saída: rode e observe.
 - **Decisão sobre entradas inválidas:** duas opções razoáveis.
   - Lançar erro (`throw`): quem chamou com valor errado tem um bug, e é melhor descobrir cedo.
   - Retornar algo como `"R$ 0,00"`: a tela nunca quebra, mas o bug fica escondido.

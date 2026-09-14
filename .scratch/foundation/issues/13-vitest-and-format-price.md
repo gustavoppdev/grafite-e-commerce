@@ -1,6 +1,6 @@
 # 13 - Vitest e `formatPrice`
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 01
 
