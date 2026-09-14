@@ -1,6 +1,6 @@
 # 06 - `error.tsx` e `global-error.tsx`
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 04
 
