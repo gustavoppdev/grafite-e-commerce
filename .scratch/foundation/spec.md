@@ -103,11 +103,11 @@ prisma/
 |---|---|---|---|
 | 01 | Criar o projeto e ferramentas | Claude | - |
 | 02 | Tema, fonte e tokens visuais | Claude | 01 |
-| 03 | Página `/design-system` | Gustavo | 02, 11 |
+| 03 | Página `/design-system` | Claude | 02, 11 |
 | 04 | Header da loja | Claude | 02 |
-| 05 | Footer da loja | Gustavo | 04 |
+| 05 | Footer da loja | Claude | 04 |
 | 06 | `error.tsx` e `global-error.tsx` | Claude | 04 |
-| 07 | `not-found.tsx` e `loading.tsx` | Gustavo | 06 |
+| 07 | `not-found.tsx` e `loading.tsx` | Claude | 06 |
 | 08 | Validação de variáveis de ambiente | Claude | 01 |
 | 09 | Criar projeto no Supabase e preencher `.env` | Gustavo | 08 |
 | 10 | Prisma + Supabase + `/api/health` | Claude | 09 |

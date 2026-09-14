@@ -16,8 +16,10 @@ A study project: the goal is for the human (Gustavo) to learn, not just to ship.
 
 Every ticket has a `Responsável:` line set in the spec: `Claude` or `Gustavo`.
 
-- **Claude tickets** are worked examples: the first occurrence of each new pattern (and first-time security-critical code such as auth config or the Checkout stock transaction). Implement them fully, with short explanatory comments in pt-BR that explain *why*, not *what*.
-- **Gustavo tickets** are exercises: the next occurrence of a pattern already shown. Never implement them. The ticket carries a `## Guia` section with steps, hints, pitfalls and a pointer to the worked example, but not the solution. When he's stuck, give hints before code.
+- **UI is always Claude's**: pages, layouts, components and styling. Gustavo found UI exercises too abstract without a visual reference, so never assign him UI tickets.
+- **Gustavo takes non-UI work**: server actions, queries, Zod schemas, domain rules, tests, config and infrastructure (Supabase, Vercel).
+- **Claude tickets** are worked examples: all UI, plus the first occurrence of each new non-UI pattern (and first-time security-critical code such as auth config or the Checkout stock transaction). Implement them fully, with short explanatory comments in pt-BR that explain *why*, not *what*.
+- **Gustavo tickets** are exercises: the next occurrence of a non-UI pattern already shown. Never implement them. The ticket carries a `## Guia` section with steps, hints, pitfalls and a pointer to the worked example, but not the solution. When he's stuck, give hints before code.
 - **Review**: when Gustavo finishes a ticket, review his code against the spec (bugs, security, practices) and explain what you would change and why.
 - **Fading**: in later features Gustavo takes more tickets, including new patterns with only a guide.
 - Explain security measures by the attack they prevent, and add missing ones proactively.
