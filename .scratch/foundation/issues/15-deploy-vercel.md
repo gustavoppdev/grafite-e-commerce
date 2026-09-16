@@ -1,6 +1,6 @@
 # 15 - Deploy na Vercel
 
-Status: open
+Status: resolved
 Responsável: Gustavo
 Blocked by: 05, 07, 10, 12, 14, 17
 
@@ -10,12 +10,12 @@ Publicar a Fundação: repositório no GitHub, projeto na Vercel conectado a ele
 
 ## Critérios de aceite
 
-- [ ] Repositório no GitHub (privado ou público) com o código; `.env` **não** está no repositório.
-- [ ] Projeto na Vercel importado do GitHub, build passando.
-- [ ] `https://<seu-projeto>.vercel.app/` mostra a home com header/footer.
-- [ ] `https://<seu-projeto>.vercel.app/api/health` responde `ok`.
-- [ ] `/design-system` dá 404 na Vercel.
-- [ ] Headers de segurança presentes na resposta da Vercel.
+- [x] Repositório no GitHub (privado ou público) com o código; `.env` **não** está no repositório.
+- [x] Projeto na Vercel importado do GitHub, build passando.
+- [x] `https://<seu-projeto>.vercel.app/` mostra a home com header/footer.
+- [x] `https://<seu-projeto>.vercel.app/api/health` responde `ok`.
+- [x] `/design-system` dá 404 na Vercel.
+- [x] Headers de segurança presentes na resposta da Vercel.
 
 ## Guia
 
@@ -27,3 +27,25 @@ Publicar a Fundação: repositório no GitHub, projeto na Vercel conectado a ele
 - **Se o build falhar:** leia o log de build da Vercel de baixo para cima e procure a **primeira** mensagem de erro. Os suspeitos de sempre, em ordem: variável de ambiente faltando (o ticket 08 deve dar uma mensagem clara), Prisma Client não gerado (ticket 10, `postinstall`), senha com caractere especial não codificado na URL.
 - **Se `/api/health` der 503 só na Vercel:** o problema é quase sempre a URL do pooler ou seus parâmetros. Compare com o que funcionou localmente.
 - **Conferir headers:** DevTools → Network → clique no documento → Response Headers. Ou `curl -I https://<seu-projeto>.vercel.app`.
+
+## Comments
+
+No ar em **https://grafite-five.vercel.app** com apenas `DATABASE_URL` configurada na Vercel
+(ver o commit que tirou a `DIRECT_URL` do schema da aplicação).
+
+Verificado em produção:
+
+- `/api/health` responde `{"status":"ok"}` — Prisma, pooler e TLS verificado funcionando.
+- `/design-system` responde 404; `/` responde 200.
+- Os 6 headers de segurança presentes em `/`, `/api/health`, `/design-system` e numa rota
+  inexistente. `x-powered-by` ausente.
+- A CSP está na variante de PRODUÇÃO: sem `'unsafe-eval'`, sem `ws:`, com
+  `upgrade-insecure-requests` — as três diferenças previstas no ticket 12.
+- CSP testada ativamente no site no ar, não só lida no header: `fetch` para domínio externo,
+  `<script>` de CDN e `<base href>` hostil, os três bloqueados. Fonte do `next/font` carregada.
+
+**Anotado para a Feature 1:** as respostas servidas do cache estático da Vercel (home e 404)
+trazem `access-control-allow-origin: *`, adicionado pelo CDN deles, não por nós (o
+`/api/health` não tem). Hoje é inofensivo — as páginas são públicas e o navegador proíbe
+combinar `*` com envio de cookie — mas precisa ser reconferido quando existirem páginas
+autenticadas.

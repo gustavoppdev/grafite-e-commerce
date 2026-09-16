@@ -111,15 +111,15 @@ com componente arrasta o servidor para o bundle do cliente.
 
 ## Critérios de aceite
 
-- [ ] `pnpm dev`, `pnpm build`, `pnpm lint` (Biome) e `pnpm test` passam sem erros.
-- [ ] App sobe com env inválida? **Não**: falha com mensagem clara dizendo qual variável está errada.
-- [ ] Home da loja mostra header e footer, responsivos em ~400px e desktop.
-- [ ] `/design-system` mostra tipografia, cores, botões, inputs, placeholder de Produto e demo de toast via server action; 404 em produção.
-- [ ] Erro lançado numa página de teste mostra o `error.tsx`; rota inexistente mostra o `not-found.tsx`.
-- [ ] `/api/health` responde `ok` localmente e na Vercel.
-- [ ] Headers de segurança presentes na resposta (conferir no DevTools → Network).
-- [ ] `formatPrice` coberto por testes, incluindo casos de borda.
-- [ ] Deploy na Vercel funcionando, com variáveis de ambiente configuradas lá.
+- [x] `pnpm dev`, `pnpm build`, `pnpm lint` (Biome) e `pnpm test` passam sem erros.
+- [x] App sobe com env inválida? **Não**: falha com mensagem clara dizendo qual variável está errada.
+- [x] Home da loja mostra header e footer, responsivos em ~400px e desktop.
+- [x] `/design-system` mostra tipografia, cores, botões, inputs, placeholder de Produto e demo de toast via server action; 404 em produção.
+- [x] Erro lançado numa página de teste mostra o `error.tsx`; rota inexistente mostra o `not-found.tsx`.
+- [x] `/api/health` responde `ok` localmente e na Vercel.
+- [x] Headers de segurança presentes na resposta (conferir no DevTools → Network).
+- [x] `formatPrice` coberto por testes, incluindo casos de borda.
+- [x] Deploy na Vercel funcionando, com variáveis de ambiente configuradas lá.
 
 ### Nome da loja
 - **GRAFITE**, papelaria fina. Logo: `GRAFITE` em caixa alta com letter-spacing largo.
@@ -130,7 +130,7 @@ com componente arrasta o servidor para o bundle do cliente.
 2. ~~**03** `/design-system` (Claude)~~ — resolvido.
 3. ~~**12** Headers de segurança (Claude)~~ — resolvido.
 4. ~~**14** Casos de borda de `formatPrice` (Gustavo)~~ — resolvido e revisado.
-5. **15** Deploy (Gustavo) — único ticket aberto da Fundação; todos os bloqueios estão `resolved`.
+5. ~~**15** Deploy (Gustavo)~~ — resolvido. **Feature 0 concluída: 17/17.**
 
 ## Tickets
 

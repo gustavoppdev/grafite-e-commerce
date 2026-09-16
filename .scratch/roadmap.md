@@ -4,7 +4,7 @@ Cada feature é entregável sozinha e vai para produção (Vercel) ao terminar. 
 
 | # | Feature | Slug | Aprendizado principal | Status |
 |---|---|---|---|---|
-| 0 | Fundação | `foundation` | Next 16, pnpm, Biome, shadcn + direção visual, Prisma + Supabase, env com Zod, error/loading/not-found, padrão de resultado das actions, toasts, headers de segurança, Vitest, deploy | falta só o deploy (ticket 15) |
+| 0 | Fundação | `foundation` | Next 16, pnpm, Biome, shadcn + direção visual, Prisma + Supabase, env com Zod, error/loading/not-found, padrão de resultado das actions, toasts, headers de segurança, Vitest, deploy | **concluída** — https://grafite-five.vercel.app |
 | 1 | Auth: essencial | `auth-core` | better-auth, cadastro/login/logout, plugin admin (papéis `user`/`admin`), script do primeiro Admin, `proxy.ts`, `requireUser`/`requireAdmin`, rate limit (no banco, mais rígido em rotas sensíveis) | pendente |
 | 2 | Auth: segurança da conta | `auth-hardening` | Resend + React Email, verificação de e-mail, recuperação de senha, senhas vazadas (HIBP), Turnstile, sessões ativas, derrubar sessões ao trocar senha | pendente |
 | 3 | Admin: Categorias e Produtos | `admin-catalog` | CRUD, RHF + Zod, Slug, arquivamento, tabela paginada, seed | pendente |
@@ -24,6 +24,10 @@ Definida na Fundação e descrita em `.scratch/foundation/spec.md`. Regra centra
 nenhum fora tem.
 
 ## Notas para features futuras
+
+- **Feature 1 (Auth):** as respostas servidas do cache estático da Vercel trazem
+  `access-control-allow-origin: *` (adicionado pelo CDN deles, não por nós). Inofensivo
+  enquanto tudo é público; reconferir quando existirem páginas autenticadas.
 
 - **Feature 5 (Catálogo):** `src/app/(store)/loading.tsx` faz toda página da loja responder em streaming, então `notFound()` (ex. Produto inexistente ou arquivado) devolve HTTP 200 + `noindex` em vez de 404. Ao criar as rotas de produto, mover o `loading.tsx` para a listagem e decidir se a página de Produto precisa de 404 real (verificado na Feature 0, ticket 07).
 
