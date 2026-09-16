@@ -104,7 +104,7 @@ prisma/
 1. ~~**11** `ActionResult` e toasts (Claude)~~ — resolvido.
 2. **03** `/design-system` (Claude): faltam as seções 1 a 5; a de toast e o 404 em produção vieram no 11.
 3. **12** Headers de segurança (Claude).
-4. **14** Casos de borda de `formatPrice` (Gustavo), em paralelo. Revisar quando ele avisar.
+4. ~~**14** Casos de borda de `formatPrice` (Gustavo)~~ — resolvido e revisado.
 5. **15** Deploy (Gustavo), quando tudo acima estiver `resolved`.
 
 ## Tickets
