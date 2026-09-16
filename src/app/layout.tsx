@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Toaster } from "@/components/ui/sonner";
 import { siteConfig } from "@/lib/site";
 import { fontSans } from "./fonts";
 import "./globals.css";
@@ -20,7 +21,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // `lang` correto faz leitores de tela pronunciarem o texto em português
     // e ajuda o navegador a hifenizar e traduzir corretamente.
     <html lang="pt-BR" className={`${fontSans.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        {/*
+          Um único <Toaster /> para o app inteiro, no layout raiz: ele é o lugar onde os
+          toasts são renderizados, e `toast()` de qualquer componente fala com este aqui.
+          Dois Toasters na árvore mostrariam a mesma mensagem duas vezes.
+        */}
+        <Toaster />
+      </body>
     </html>
   );
 }

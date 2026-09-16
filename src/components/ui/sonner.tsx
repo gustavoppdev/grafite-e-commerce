@@ -33,7 +33,17 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          toast: "cn-toast",
+          /*
+            O sonner injeta o próprio CSS em runtime, depois da nossa folha de estilo,
+            então a sombra dele venceria a nossa classe por ordem de declaração. O `!`
+            (`!shadow-none`) marca a regra como `!important` e resolve — é a exceção que
+            se justifica quando o estilo vem de uma biblioteca de terceiros.
+          */
+          toast: "!shadow-none rounded-none",
+          title: "font-normal",
+          description: "text-meta text-muted-foreground",
+          // Mesma cor de erro do resto da loja (borda de campo inválido, mensagens).
+          error: "[&_[data-icon]]:text-destructive",
         },
       }}
       {...props}

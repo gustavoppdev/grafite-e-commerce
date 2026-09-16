@@ -23,3 +23,8 @@ A página deve responder **404 em produção**.
 - [ ] Todas as 6 seções aparecem e ficam boas em ~400px e no desktop.
 - [ ] Nenhuma cor em hex no JSX: só classes de token.
 - [ ] Em `pnpm build && pnpm start`, `/design-system` dá 404.
+
+## Comments
+
+O arquivo `src/app/design-system/page.tsx` já existe desde o ticket 11, com a seção 6 (toast)
+e o 404 em produção prontos. Falta só acrescentar as seções 1 a 5.
