@@ -30,11 +30,36 @@ src/
 │   └── api/health/
 ├── components/
 │   ├── ui/                   gerado pelo shadcn (não editar à toa)
-│   └── layout/               header, footer, container
+│   ├── layout/               o casco da loja: header, footer, container, logo
+│   └── common/               padrões nossos, reutilizáveis (PageMessage)
 ├── features/<feature>/       actions.ts, queries.ts, schemas.ts, components/
-└── lib/                      infraestrutura compartilhada: env, prisma, format, action-result
+├── server/                   SÓ SERVIDOR: env, db, e depois auth/sessão/rate limit
+├── config/                   valores do projeto: env.schema, site, security-headers
+└── lib/                      puro, sem I/O, roda nos dois lados: action-result, format
 prisma/
 ```
+
+A pasta que mais importa é `server/`, e a regra dela é uma só: **todo arquivo em
+`src/server/` começa com `import "server-only"`**, e nenhum arquivo fora dela tem essa
+linha. Isso torna a fronteira de segurança visível na árvore de pastas em vez de escondida
+dentro dos arquivos — importar o cliente do banco num Client Component vazaria a URL de
+conexão (com senha) para o JavaScript do navegador, e o `server-only` quebra o build antes.
+
+Critério para escolher a pasta:
+
+| pergunta | pasta |
+|---|---|
+| Toca segredo, banco ou rede? | `server/` |
+| É valor de configuração do projeto? | `config/` |
+| É função pura, sem I/O, testável? | `lib/` |
+| Pertence a uma feature específica? | `features/<feature>/` |
+
+`config/env.schema.ts` fica em `config/` e **não** pode ter `server-only`: o `next.config.ts`
+roda fora do React e precisa importá-lo. O singleton validado (`server/env.ts`) é que tem a
+proteção, e é dele que o app importa.
+
+Sem barrel files (`index.ts` reexportando a pasta): um barrel que junta código de servidor
+com componente arrasta o servidor para o bundle do cliente.
 
 ### Direção visual (referência: therow.com, adaptada)
 
@@ -61,7 +86,7 @@ prisma/
 ### Header da loja
 - Desktop: logo à esquerda **ou** centralizado (decidir vendo na tela), links de categorias visíveis, ícones de busca e carrinho à direita. Altura ~60px.
 - Mobile: menu hambúrguer à esquerda (shadcn `Sheet`), logo centralizado, carrinho à direita.
-- Nesta feature as categorias são links fixos de exemplo; na Feature 4 viram dados reais.
+- Nesta feature as categorias são links fixos de exemplo; na Feature 5 viram dados reais.
 
 ### Padrões globais
 - **Env:** `src/lib/env.ts` valida `process.env` com Zod na inicialização, falha com mensagem clara, marcado com `server-only`. `.env.example` versionado, `.env` no `.gitignore`.

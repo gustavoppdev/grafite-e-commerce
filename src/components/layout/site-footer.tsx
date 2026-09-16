@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { siteConfig } from "@/lib/site";
+import { siteConfig } from "@/config/site";
 import { Container } from "./container";
 import { Logo } from "./logo";
 import { accountLinks, categoryLinks, type NavLink } from "./navigation";

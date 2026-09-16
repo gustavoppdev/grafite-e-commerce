@@ -25,7 +25,7 @@ ataque cada header mitiga" sao longos por natureza.
 **CSP sem nonce**, como a spec previu. `script-src` leva `'unsafe-inline'` porque o Next
 injeta scripts inline sem `nonce`; a alternativa (nonce por requisicao no `proxy.ts`) forca
 renderizacao dinamica em todas as paginas e mata o cache estatico - decisao adiada para a
-Feature 10. Registrado no comentario que, com `'unsafe-inline'`, a CSP quase nao protege
+Feature 11. Registrado no comentario que, com `'unsafe-inline'`, a CSP quase nao protege
 contra XSS refletido; o que ela ainda garante e bloquear script de outro dominio, e e isso
 que segura a exfiltracao.
 
@@ -36,7 +36,7 @@ porque IP de LAN nao e origem confiavel e a requisicao seria promovida para http
 
 **Adicionado alem da spec:** `Strict-Transport-Security` (sem `preload`, que e compromisso
 quase irreversivel e nao se justifica num projeto de estudo) e `payment=()` no
-`Permissions-Policy` - o checkout da Feature 7 e simulado e nunca chama a Payment Request API.
+`Permissions-Policy` - o checkout da Feature 8 e simulado e nunca chama a Payment Request API.
 
 **Verificado.** Dev e `build && start`: todos os headers presentes em `/` e em `/api/health`,
 `X-Powered-By` ausente, zero violacao de CSP no console, fonte do `next/font` carregada

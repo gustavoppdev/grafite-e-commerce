@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Toaster } from "@/components/ui/sonner";
-import { siteConfig } from "@/lib/site";
+import { siteConfig } from "@/config/site";
 import { fontSans } from "./fonts";
 import "./globals.css";
 

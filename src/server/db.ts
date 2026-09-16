@@ -3,7 +3,16 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
-import { env } from "./env";
+import { env } from "@/server/env";
+
+/*
+  Cliente do banco. O arquivo se chama `db` e não `prisma` porque quem importa daqui
+  quer "o banco", não "a biblioteca": se um dia o ORM mudar, muda este arquivo e não
+  o import de cada chamador.
+
+  Mora em `src/server/` — TODO arquivo desta pasta começa com `import "server-only"`.
+  A pasta é a fronteira visível entre o que pode e o que não pode chegar ao navegador.
+*/
 
 /*
   Por que um "singleton" guardado em globalThis?

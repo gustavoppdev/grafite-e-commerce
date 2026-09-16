@@ -1,5 +1,5 @@
 import { cn } from "cn";
-import { siteConfig } from "@/lib/site";
+import { siteConfig } from "@/config/site";
 
 // O logo é só tipografia: caixa alta com espaçamento largo, o único elemento
 // "expressivo" num site onde todo o resto é contido.

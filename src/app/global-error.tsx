@@ -10,7 +10,7 @@
 */
 
 import { useEffect } from "react";
-import { PageMessage } from "@/components/layout/page-message";
+import { PageMessage } from "@/components/common/page-message";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { fontSans } from "./fonts";
 import "./globals.css";

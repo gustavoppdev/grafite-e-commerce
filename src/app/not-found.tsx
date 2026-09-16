@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { PageMessage } from "@/components/layout/page-message";
+import { PageMessage } from "@/components/common/page-message";
 import { StoreShell } from "@/components/layout/store-shell";
 import { buttonVariants } from "@/components/ui/button";
 

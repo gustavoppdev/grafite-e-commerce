@@ -30,6 +30,10 @@ _Avoid_: Item, SKU, variant
 A Product hidden from the storefront and no longer purchasable, but still visible to Admins and in past Orders. Products are archived, never deleted.
 _Avoid_: Deleted product, inactive product, disabled product
 
+**Product Image** (Imagem do Produto):
+The single image an Admin uploads for a Product. Optional: a Product without one is sold normally and shows a neutral placeholder. There is no gallery — a Product has at most one. Customers never upload anything.
+_Avoid_: Photo, thumbnail, gallery, media
+
 **Category** (Categoria):
 A flat grouping of Products. Every Product belongs to exactly one Category; Categories have no subcategories. A Category can only be removed when it has no Products.
 _Avoid_: Collection, department, tag

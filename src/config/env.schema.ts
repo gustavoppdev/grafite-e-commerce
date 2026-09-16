@@ -8,9 +8,10 @@ import { z } from "zod";
   dentro do JavaScript enviado ao usuário no momento do build. Qualquer pessoa consegue
   ler. Por isso, segredo (senha, chave de API, URL do banco) nunca leva esse prefixo.
 
-  Este arquivo não importa "server-only" de propósito: o `next.config.ts` (que roda
+  Mora em `src/config/` (e não em `src/server/`) justamente porque não pode ter
+  "server-only": este arquivo não importa "server-only" de propósito: o `next.config.ts` (que roda
   fora do React) e os testes precisam importá-lo. Quem usa o `env` no app importa
-  de `@/lib/env`, que tem a proteção.
+  de `@/server/env`, que tem a proteção.
 */
 
 const postgresUrl = z.url({

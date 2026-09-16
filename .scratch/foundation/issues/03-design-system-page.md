@@ -38,7 +38,7 @@ lista `colorTokens` repete `bg-background`, `bg-foreground`... em vez de derivar
 token. Registrado em comentário porque é a pegadinha que mais aparece com Tailwind.
 
 **Bloco de Produto** ficou local ao arquivo: é a forma visual para acertar proporção e
-espaçamento, não o componente de verdade. Ele nasce em `src/features/products/` na Feature 4,
+espaçamento, não o componente de verdade. Ele nasce em `src/features/products/` na Feature 5,
 e usa a mesma `aspect-3/4` do `ProductGridSkeleton` para a grade não pular quando os dados
 chegarem. Esgotado usa os dois tokens conforme a spec: nome e preço riscado em
 `subtle-foreground`, etiqueta em `muted-foreground`.

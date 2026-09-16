@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
-import { parseServerEnv } from "./src/lib/env.schema";
-import { securityHeaders } from "./src/lib/security-headers";
+import { parseServerEnv } from "./src/config/env.schema";
+import { securityHeaders } from "./src/config/security-headers";
 
 // O next.config roda ao iniciar `next dev` e `next build`, com o .env já carregado.
 // Validar aqui faz o projeto falhar na hora, com mensagem clara, em vez de quebrar

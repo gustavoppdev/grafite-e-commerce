@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { prisma } from "@/server/db";
 
 // Sem cache em nenhuma camada (Next, CDN da Vercel, navegador): um health check
 // guardado em cache diria "ok" mesmo com o banco fora do ar.
