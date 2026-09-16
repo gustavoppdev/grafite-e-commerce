@@ -102,10 +102,10 @@ prisma/
 ## Próximos passos (atualizado em 2026-09-16)
 
 1. ~~**11** `ActionResult` e toasts (Claude)~~ — resolvido.
-2. **03** `/design-system` (Claude): faltam as seções 1 a 5; a de toast e o 404 em produção vieram no 11.
+2. ~~**03** `/design-system` (Claude)~~ — resolvido.
 3. ~~**12** Headers de segurança (Claude)~~ — resolvido.
 4. ~~**14** Casos de borda de `formatPrice` (Gustavo)~~ — resolvido e revisado.
-5. **15** Deploy (Gustavo), quando tudo acima estiver `resolved`.
+5. **15** Deploy (Gustavo) — único ticket aberto da Fundação; todos os bloqueios estão `resolved`.
 
 ## Tickets
 
