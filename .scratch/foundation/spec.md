@@ -80,7 +80,7 @@ prisma/
 - `GET /api/health` executa `SELECT 1` e responde `{ status: "ok" }` ou `503 { status: "error" }`, **sem expor a mensagem de erro**.
 
 ### Segurança
-- Headers no `next.config`: `Content-Security-Policy` (base, sem nonce por enquanto), `X-Frame-Options: DENY` + `frame-ancestors 'none'` (clickjacking), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` desligando câmera/microfone/geolocalização, `poweredByHeader: false`.
+- Headers no `next.config`: `Content-Security-Policy` (base, sem nonce por enquanto), `X-Frame-Options: DENY` + `frame-ancestors 'none'` (clickjacking), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` desligando câmera/microfone/geolocalização/pagamento, `Strict-Transport-Security` (sem `preload`), `poweredByHeader: false`. Valores e comentários em `src/lib/security-headers.ts`.
 - CSP será ajustada nas features 2 (Turnstile) e 10 (revisão final). CSP com nonce força renderização dinâmica em todas as páginas, então fica como decisão da revisão final.
 - `/design-system` retorna 404 em produção.
 
@@ -103,7 +103,7 @@ prisma/
 
 1. ~~**11** `ActionResult` e toasts (Claude)~~ — resolvido.
 2. **03** `/design-system` (Claude): faltam as seções 1 a 5; a de toast e o 404 em produção vieram no 11.
-3. **12** Headers de segurança (Claude).
+3. ~~**12** Headers de segurança (Claude)~~ — resolvido.
 4. ~~**14** Casos de borda de `formatPrice` (Gustavo)~~ — resolvido e revisado.
 5. **15** Deploy (Gustavo), quando tudo acima estiver `resolved`.
 
