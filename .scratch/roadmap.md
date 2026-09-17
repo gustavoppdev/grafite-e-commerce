@@ -5,7 +5,7 @@ Cada feature é entregável sozinha e vai para produção (Vercel) ao terminar. 
 | # | Feature | Slug | Aprendizado principal | Status |
 |---|---|---|---|---|
 | 0 | Fundação | `foundation` | Next 16, pnpm, Biome, shadcn + direção visual, Prisma + Supabase, env com Zod, error/loading/not-found, padrão de resultado das actions, toasts, headers de segurança, Vitest, deploy | **concluída** — https://grafite-five.vercel.app |
-| 1 | Auth: essencial | `auth-core` | better-auth, cadastro/login/logout, plugin admin (papéis `user`/`admin`), script do primeiro Admin, `proxy.ts`, `requireUser`/`requireAdmin`, rate limit (no banco, mais rígido em rotas sensíveis) | pendente |
+| 1 | Auth: essencial | `auth-core` | better-auth, cadastro/login/logout, plugin admin (papéis `user`/`admin`), primeiro Admin fora da interface, `proxy.ts`, `requireUser`/`requireAdmin`, rate limit (no banco, mais rígido em rotas sensíveis), proteção de open redirect | **em andamento** (spec e 16 tickets escritos) |
 | 2 | Auth: segurança da conta | `auth-hardening` | Resend + React Email, verificação de e-mail, recuperação de senha, senhas vazadas (HIBP), Turnstile, sessões ativas, derrubar sessões ao trocar senha | pendente |
 | 3 | Admin: Categorias e Produtos | `admin-catalog` | CRUD, RHF + Zod, Slug, arquivamento, tabela paginada, seed | pendente |
 | 4 | Imagens de Produto | `product-images` | Upload no Admin, storage (Supabase Storage), validação do tipo REAL do arquivo, limite de tamanho, URL assinada, `next/image` | pendente |
@@ -26,10 +26,26 @@ nenhum fora tem.
 ## Notas para features futuras
 
 - **Feature 1 (Auth):** as respostas servidas do cache estático da Vercel trazem
-  `access-control-allow-origin: *` (adicionado pelo CDN deles, não por nós). Inofensivo
-  enquanto tudo é público; reconferir quando existirem páginas autenticadas.
+  `access-control-allow-origin: *` (adicionado pelo CDN deles, não por nós). Endereçado na
+  Feature 1: ler a sessão no header torna as páginas da loja dinâmicas, então resposta
+  autenticada não passa mais pelo cache estático. **Conferir no ticket 15** e fechar a nota.
 
-- **Feature 5 (Catálogo):** `src/app/(store)/loading.tsx` faz toda página da loja responder em streaming, então `notFound()` (ex. Produto inexistente ou arquivado) devolve HTTP 200 + `noindex` em vez de 404. Ao criar as rotas de produto, mover o `loading.tsx` para a listagem e decidir se a página de Produto precisa de 404 real (verificado na Feature 0, ticket 07).
+- **Feature 5 (Catálogo):** a sessão é lida no header da loja (Feature 1), o que torna
+  **toda página da loja dinâmica** — e a página de Produto é justamente o caso perfeito de
+  cache de CDN. Decisão emprestada, não definitiva: a Feature 1 a manteve porque hoje não
+  existe página que mereça cache (a home está vazia). Ao construir o catálogo, reabrir com
+  as duas alternativas já escritas na spec de `auth-core` ("Rotas e telas"): **(b)** header
+  neutro com a loja inteira estática, ou **(c)** casca neutra estática + Client Component
+  que troca para o nome na hidratação via `authClient.useSession()` — cache preservado e
+  nome na tela. A (c) é provavelmente a resposta final.
+
+- **Feature 2 (Auth: segurança da conta):** o rate limit da Feature 1 conta por
+  `${ip}|${path}`, então 100 IPs testam 100× mais senhas na mesma conta. Contar por e-mail é
+  possível (o `hooks.before` enxerga `ctx.body.email`), mas foi **adiado de propósito** para
+  comparar com o Turnstile, que ataca o mesmo cenário sem contador de concorrência nosso.
+  Decidir lá, com as duas opções na mesa.
+
+- **Feature 5 (Catálogo):** `src/app/(store)/loading.tsx` faz toda página da loja responder em streaming, então `notFound()` (ex. Produto inexistente ou arquivado) devolve HTTP 200 + `noindex` em vez de 404. A Feature 1 **remove** esse `loading.tsx` (ticket 08: ele é um skeleton de grade de produtos e piscaria no login), o que deve devolver o 404 real. Cada segmento ganha o seu `loading.tsx` a partir da Feature 5.
 
 ## Decisões transversais
 
