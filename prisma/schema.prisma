@@ -1,5 +1,5 @@
 // Prisma 7: as URLs de conexão não ficam mais aqui, e sim em prisma.config.ts (CLI)
-// e em src/lib/prisma.ts (aplicação, via adaptador).
+// e em src/server/db.ts (aplicação, via adaptador).
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +10,91 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ─── Auth (better-auth) ──────────────────────────────────────────────────────────
+//
+// Gerado pela CLI do better-auth (`auth generate`) e revisado à mão; como gerar de novo
+// está no ticket 04 de `auth-core`. Se mudar plugin ou opção que mexe em tabela no
+// `src/server/auth.ts`, gere de novo: na inicialização o better-auth compara este schema
+// com o que ele espera e responde 500 em toda rota de auth se divergir.
+//
+// Três escolhas que valem notar:
+// - `id String @id` SEM `@default`: o better-auth gera um ID aleatório na aplicação.
+//   Nunca `autoincrement()`: ID sequencial deixa adivinhar o registro seguinte (IDOR) e
+//   revela quantas contas a loja tem.
+// - `role` pode ser nulo: quem grava "user" é o plugin admin, no cadastro. Um usuário
+//   criado por fora dele fica com `null`, e `requireAdmin` compara com "admin", então
+//   nulo cai no lado seguro (sem acesso).
+// - `onDelete: Cascade`: apagar um usuário apaga as sessões e contas dele. Sem isso, a
+//   sessão sobreviveria ao dono.
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          String?
+  banned        Boolean?  @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  // Hash scrypt da senha (nunca a senha). Mora em `account`, não em `user`, então uma
+  // query de usuário não carrega o hash por acidente.
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
 }
