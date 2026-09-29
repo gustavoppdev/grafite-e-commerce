@@ -1,7 +1,7 @@
 # 02 - `safeRedirectPath` e testes
 
-Status: open
-Responsável: Gustavo
+Status: resolved
+Responsável: ~~Gustavo~~ Claude
 Blocked by: -
 
 ## O que
@@ -17,11 +17,11 @@ Quem vai usar: a página `/entrar` (ticket 08), lendo `?next=`, e depois a Featu
 
 ## Critérios de aceite
 
-- [ ] Caminho interno comum (`/conta/pedidos`, com query e com hash) passa intacto.
-- [ ] Todo valor da lista de ataques abaixo cai no `fallback`.
-- [ ] `undefined`, `null`, string vazia, número e array caem no `fallback`.
-- [ ] Um teste por caso, nome descritivo em inglês.
-- [ ] `pnpm test` passa e a suíte foi verificada por sabotagem (ver Guia).
+- [x] Caminho interno comum (`/conta/pedidos`, com query e com hash) passa intacto.
+- [x] Todo valor da lista de ataques abaixo cai no `fallback`.
+- [x] `undefined`, `null`, string vazia, número e array caem no `fallback`.
+- [x] Um teste por caso, nome descritivo em inglês.
+- [x] `pnpm test` passa e a suíte foi verificada por sabotagem (ver Guia).
 
 ## Guia
 
@@ -91,3 +91,24 @@ passam por uma checagem ingênua do tipo "começa com `/`":
   você nunca descobre se o parâmetro é usado.
 
 ## Comments
+
+### 2026-09-28 — Claude: virou exemplo trabalhado
+
+Gustavo travou depois de duas rodadas de dicas e pediu a solução para estudar e refazer
+depois. Mesmo caminho do ticket 01: o ticket passa a ser exemplo trabalhado.
+
+Decisões, todas explicadas nos comentários de `src/lib/safe-redirect.ts`:
+
+- **Forma estreita (regex de lista de permissão)**: uma barra, 2º caractere que não seja
+  `/` nem `\`, e daí em diante só caracteres de caminho ASCII. `@`, `\`, `:`, espaço e
+  controle ficam de fora.
+- **Não decodifica**: recusa `%2f`, `%5c` e `%25`. Validar a mesma string que será usada;
+  o `searchParams` já decodificou uma vez, então barra codificada aqui é ataque.
+- **`new URL` como segunda opinião**, não como regra principal.
+- **Caminho interno desconhecido passa**: a autorização da página decide (ADR 0003).
+
+Sabotagem com `value.startsWith("/")`: 11 de 31 testes falham, incluindo `//`, `/\`,
+`/%2f%2f` e `@` da tabela.
+
+**Para refazer:** apague o corpo da função e os comentários, mantenha os testes, e
+reescreva até ficar verde. Depois compare com esta versão.

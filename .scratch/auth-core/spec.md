@@ -414,7 +414,7 @@ As duas alternativas, escritas aqui para a Feature 5 não redescobrir o problema
 | # | Ticket | Responsável | Bloqueado por |
 |---|---|---|---|
 | 01 | Variáveis de ambiente do better-auth | ~~Gustavo~~ Claude | - |
-| 02 | `safeRedirectPath` e testes | Gustavo | - |
+| 02 | `safeRedirectPath` e testes | ~~Gustavo~~ Claude | - |
 | 03 | Instalar e configurar o better-auth | Claude | 01 |
 | 04 | Tabelas de auth: schema e primeira migration | Claude | 03 |
 | 05 | Sessão no servidor: `getSession`, `requireUser`, `requireAdmin` | Claude | 04 |
