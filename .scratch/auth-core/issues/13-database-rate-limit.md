@@ -1,7 +1,7 @@
 # 13 - Rate limit no banco, mais rígido nas rotas sensíveis
 
 Status: open
-Responsável: Gustavo
+Responsável: ~~Gustavo~~ Claude
 Blocked by: 04
 
 ## O que

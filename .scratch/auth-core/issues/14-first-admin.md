@@ -1,7 +1,7 @@
 # 14 - Primeiro Admin
 
 Status: open
-Responsável: Gustavo
+Responsável: ~~Gustavo~~ Claude
 Blocked by: 04, 09
 
 ## O que

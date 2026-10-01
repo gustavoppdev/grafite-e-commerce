@@ -1,7 +1,7 @@
 # 06 - Schemas de cadastro e login (Zod) e testes
 
 Status: open
-Responsável: Gustavo
+Responsável: ~~Gustavo~~ Claude
 Blocked by: -
 
 ## O que

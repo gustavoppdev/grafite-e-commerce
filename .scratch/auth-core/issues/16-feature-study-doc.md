@@ -1,7 +1,7 @@
 # 16 - Doc de estudo da feature
 
 Status: open
-Responsável: Gustavo
+Responsável: ~~Gustavo~~ Claude
 Blocked by: 15
 
 ## O que

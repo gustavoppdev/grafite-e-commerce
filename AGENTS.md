@@ -10,19 +10,29 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # GRAFITE (study e-commerce)
 
-A study project: the goal is for the human (Gustavo) to learn, not just to ship. Talk to him in pt-BR; code, identifiers and the glossary are in English. Roadmap: `.scratch/roadmap.md`.
+A study project: Gustavo learns by reviewing finished, commented code. Talk to him in pt-BR; code, identifiers and the glossary are in English. Roadmap: `.scratch/roadmap.md`.
 
 ## Learning workflow
 
-Every ticket has a `Responsável:` line set in the spec: `Claude` or `Gustavo`.
+Gustavo's priority is **finishing this project**: he struggles with procrastination and has
+abandoned past projects mid-way, so momentum beats exercises. Since 2026-10-01:
 
-- **UI is always Claude's**: pages, layouts, components and styling. Gustavo found UI exercises too abstract without a visual reference, so never assign him UI tickets.
-- **Gustavo takes non-UI work**: server actions, queries, Zod schemas, domain rules, tests, config and infrastructure (Supabase, Vercel).
-- **Claude tickets** are worked examples: all UI, plus the first occurrence of each new non-UI pattern (and first-time security-critical code such as auth config or the Checkout stock transaction). Implement them fully, with short explanatory comments in pt-BR that explain *why*, not *what*.
-- **Gustavo tickets** are exercises: the next occurrence of a non-UI pattern already shown. Never implement them. The ticket carries a `## Guia` section with steps, hints, pitfalls and a pointer to the worked example, but not the solution. When he's stuck, give hints before code.
-- **Review**: when Gustavo finishes a ticket, review his code against the spec (bugs, security, practices) and explain what you would change and why.
-- **Fading**: in later features Gustavo takes more tickets, including new patterns with only a guide.
-- Explain security measures by the attack they prevent, and add missing ones proactively.
+- **Claude writes all the code**, every ticket (UI and non-UI). Tickets are written with
+  `Responsável: Claude`; no `## Guia` exercise sections.
+- **One ticket at a time.** At the end of each ticket, stop and hand off to Gustavo in pt-BR:
+  - a short summary of what was done and the decisions and why (security measures
+    explained by the attack they prevent);
+  - the **files to review, in reading order**.
+  Wait for him before starting the next ticket.
+- Record each ticket's decisions in its `## Comments`: they are the raw material for the
+  study doc.
+- Code keeps short explanatory comments in pt-BR that explain *why*, not *what*.
+- **At the end of each feature**, write the feature study doc in the format of the
+  Foundation one (`~/Documentos/grafite-estudo/`: a README + one chapter per topic; each
+  chapter = concept from scratch → how GRAFITE does it → pitfalls). Gustavo will later
+  rebuild each feature as an isolated study project (one per module: foundation, auth, ...),
+  so the doc must stand on its own as a guide for that.
+- Add missing security measures proactively.
 
 ## Resuming work
 
@@ -32,7 +42,7 @@ Sessions end and context gets compacted; the files are the memory. When starting
 2. Read that feature's `spec.md` and the `Status:` of its tickets in `issues/`.
 3. Check `git log --oneline` (one commit per ticket) to confirm what is done.
 
-Ticket status flow: `open` → `claimed` (work started) → `in-review` (Gustavo finished, waiting for review) → `resolved`. Update the `Status:` line and the roadmap as work moves. Prefer starting a fresh session per feature.
+Ticket status flow: `open` → `claimed` (work started) → `resolved`. Update the `Status:` line and the roadmap as work moves. Prefer starting a fresh session per feature.
 
 ## Agent skills
 

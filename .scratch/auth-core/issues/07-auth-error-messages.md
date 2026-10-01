@@ -1,7 +1,7 @@
 # 07 - Mensagens de erro do better-auth em pt-BR
 
 Status: open
-Responsável: Gustavo
+Responsável: ~~Gustavo~~ Claude
 Blocked by: 03
 
 ## O que

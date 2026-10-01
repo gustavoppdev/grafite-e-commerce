@@ -418,14 +418,14 @@ As duas alternativas, escritas aqui para a Feature 5 não redescobrir o problema
 | 03 | Instalar e configurar o better-auth | Claude | 01 |
 | 04 | Tabelas de auth: schema e primeira migration | Claude | 03 |
 | 05 | Sessão no servidor: `getSession`, `requireUser`, `requireAdmin` | Claude | 04 |
-| 06 | Schemas de cadastro e login (Zod) e testes | Gustavo | - |
-| 07 | Mensagens de erro do better-auth em pt-BR | Gustavo | 03 |
+| 06 | Schemas de cadastro e login (Zod) e testes | ~~Gustavo~~ Claude | - |
+| 07 | Mensagens de erro do better-auth em pt-BR | ~~Gustavo~~ Claude | 03 |
 | 08 | Página `/entrar` | Claude | 02, 05, 06, 07 |
 | 09 | Página `/cadastro` | Claude | 08 |
 | 10 | Sair: action de logout e menu da conta no header | Claude | 05 |
 | 11 | `/conta` e `/admin` protegidas | Claude | 05 |
 | 12 | `proxy.ts` — checagem otimista | Claude | 02, 11 |
-| 13 | Rate limit no banco, mais rígido nas rotas sensíveis | Gustavo | 04 |
-| 14 | Primeiro Admin | Gustavo | 04, 09 |
-| 15 | Deploy na Vercel com autenticação | Gustavo | 01-14 |
-| 16 | Doc de estudo da feature | Gustavo | 15 |
+| 13 | Rate limit no banco, mais rígido nas rotas sensíveis | ~~Gustavo~~ Claude | 04 |
+| 14 | Primeiro Admin | ~~Gustavo~~ Claude | 04, 09 |
+| 15 | Deploy na Vercel com autenticação | ~~Gustavo~~ Claude | 01-14 |
+| 16 | Doc de estudo da feature | ~~Gustavo~~ Claude | 15 |
