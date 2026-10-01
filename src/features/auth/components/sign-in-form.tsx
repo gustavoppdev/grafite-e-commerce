@@ -7,38 +7,10 @@ import { Button } from "@/components/ui/button";
 import { type FieldErrors, toFieldErrors } from "@/lib/action-result";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import { authClient } from "../auth-client";
-import { authErrorMessage } from "../errors";
-import { type SignInInput, signInSchema } from "../schemas";
+import { authRequest } from "../auth-request";
+import { signInSchema } from "../schemas";
 import { AuthField } from "./auth-field";
-
-/*
-  Por que um Client Component chamando o `authClient`, e não uma server action como o
-  resto do projeto: o rate limit do better-auth mora no roteador HTTP de `/api/auth/*`.
-  Uma action chamando `auth.api.signInEmail()` pularia o limite e deixaria a força bruta
-  livre (ADR 0005).
-
-  Tempo máximo de espera no navegador. O `fetch` não tem limite próprio: se o servidor
-  travar, o botão ficaria em "Entrando..." por minutos. 15s cobre com folga o caminho
-  normal (o piso de 800ms do login + as consultas, que o próprio servidor corta em 10s).
-  Desistir aqui não cancela nada no servidor; se o login tiver dado certo depois, a nova
-  tentativa só cria outra sessão.
-*/
-const REQUEST_TIMEOUT_MS = 15_000;
-
-// Devolve a frase de erro, ou `null` quando entrou.
-async function signIn(input: SignInInput): Promise<string | null> {
-  try {
-    const { error } = await authClient.signIn.email({
-      ...input,
-      fetchOptions: { timeout: REQUEST_TIMEOUT_MS },
-    });
-    return error ? authErrorMessage(error) : null;
-  } catch {
-    // Sem resposta nenhuma: rede caiu ou o tempo acabou. O `fetch` lança em vez de
-    // devolver `error`, e sem este `catch` o botão ficaria preso em "Entrando...".
-    return authErrorMessage({ status: 0 });
-  }
-}
+import { focusField } from "./focus-field";
 
 export function SignInForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
@@ -75,7 +47,9 @@ export function SignInForm({ redirectTo }: { redirectTo: string }) {
     setFieldErrors({});
 
     startTransition(async () => {
-      const message = await signIn(parsed.data);
+      const message = await authRequest((fetchOptions) =>
+        authClient.signIn.email({ ...parsed.data, fetchOptions }),
+      );
 
       if (message) {
         /*
@@ -152,10 +126,4 @@ export function SignInForm({ redirectTo }: { redirectTo: string }) {
       </Button>
     </form>
   );
-}
-
-function focusField(form: HTMLFormElement, name: string | undefined) {
-  if (!name) return;
-  const field = form.elements.namedItem(name);
-  if (field instanceof HTMLInputElement) field.focus();
 }

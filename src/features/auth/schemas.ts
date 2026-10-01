@@ -58,6 +58,9 @@ const name = z
 */
 const newPassword = z
   .string()
+  // Vazia ganha mensagem própria: "Use pelo menos 8 caracteres" num campo em branco soa
+  // como se a pessoa tivesse digitado algo curto. O formulário mostra a primeira mensagem.
+  .min(1, "Crie uma senha.")
   .min(PASSWORD_MIN_LENGTH, `Use pelo menos ${PASSWORD_MIN_LENGTH} caracteres.`)
   .max(PASSWORD_MAX_LENGTH, `Use no máximo ${PASSWORD_MAX_LENGTH} caracteres.`);
 

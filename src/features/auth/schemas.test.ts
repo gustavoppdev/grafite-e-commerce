@@ -108,6 +108,11 @@ describe("signUpSchema", () => {
     e um depois. Trocar o `min` do schema por um número próprio quebra um dos dois.
   */
   describe("password length", () => {
+    it("asks for a password when it is empty, before the minimum message", () => {
+      const result = signUpSchema.safeParse({ ...validSignUp, password: "" });
+      expect(fieldErrors(result).password?.[0]).toBe("Crie uma senha.");
+    });
+
     it("accepts exactly the minimum", () => {
       const password = "a".repeat(PASSWORD_MIN_LENGTH);
       expect(signUpSchema.safeParse({ ...validSignUp, password }).success).toBe(
