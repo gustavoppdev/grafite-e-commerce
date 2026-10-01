@@ -5,6 +5,7 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/config/auth";
+import { INVALID_SIGN_UP_FIELDS } from "@/features/auth/errors";
 import { signUpSchema } from "@/features/auth/schemas";
 import { prisma } from "@/server/db";
 import { env } from "@/server/env";
@@ -178,7 +179,7 @@ export const auth = betterAuth({
       if (!parsed.success) {
         const fields = [...new Set(parsed.error.issues.map((i) => i.path[0]))];
         throw new APIError("BAD_REQUEST", {
-          code: "INVALID_SIGN_UP_FIELDS",
+          code: INVALID_SIGN_UP_FIELDS,
           message: `invalid sign-up fields: ${fields.join(", ")}`,
         });
       }

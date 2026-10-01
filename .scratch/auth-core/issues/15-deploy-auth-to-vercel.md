@@ -57,3 +57,13 @@ seguro, cache e origem confiável.
   copie do DevTools.
 
 ## Comments
+
+### 2026-10-01 — Claude: duas pendências vindas do ticket 07
+
+- **Região da função.** O Supabase está em `sa-east-1` (São Paulo). Se as funções da
+  Vercel rodarem na região padrão (EUA), cada consulta atravessa o continente, e o login
+  faz várias. Configurar a região das funções para `gru1` (São Paulo) e conferir.
+- **Piso de tempo do login e do cadastro (800ms).** Medir em produção o tempo dos caminhos
+  lentos (cadastro com e-mail novo, login com senha errada). Se o p99 passar de ~600ms, subir
+  o `MINIMUM_RESPONSE_MS` em `src/app/api/auth/[...all]/route.ts`, senão as respostas lentas
+  escapam do piso e a diferença volta a aparecer.

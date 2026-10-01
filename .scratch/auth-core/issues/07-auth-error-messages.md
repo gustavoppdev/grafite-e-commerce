@@ -1,6 +1,6 @@
 # 07 - Mensagens de erro do better-auth em pt-BR
 
-Status: open
+Status: resolved
 Responsável: ~~Gustavo~~ Claude
 Blocked by: 03
 
@@ -22,18 +22,18 @@ biblioteca; o seu trabalho aqui é **confirmar que ela existe** e traduzir.
 
 ## Critérios de aceite
 
-- [ ] Você **verificou na prática** (não na doc) que o login devolve o mesmo código e o
+- [x] Você **verificou na prática** (não na doc) que o login devolve o mesmo código e o
       mesmo status para e-mail inexistente e para senha errada, e registrou como verificou.
-- [ ] Os códigos usados no mapa vieram de `auth.$ERROR_CODES` / `authClient.$ERROR_CODES`
+- [x] Os códigos usados no mapa vieram de `auth.$ERROR_CODES` / `authClient.$ERROR_CODES`
       ou do código da versão instalada — **não** de string escrita à mão.
-- [ ] **Não** existe mensagem de "e-mail já em uso": com `autoSignIn: false` o servidor
+- [x] **Não** existe mensagem de "e-mail já em uso": com `autoSignIn: false` o servidor
       responde sucesso genérico para e-mail duplicado (ver "Fluxo do cadastro" na spec).
       Sentir falta dela é sinal de que você entendeu a proteção — e de que ela funciona.
-- [ ] Usuário banido devolve mensagem própria, sem explicar o motivo do ban.
-- [ ] Código desconhecido devolve uma mensagem genérica, nunca a string em inglês da
+- [x] Usuário banido devolve mensagem própria, sem explicar o motivo do ban.
+- [x] Código desconhecido devolve uma mensagem genérica, nunca a string em inglês da
       biblioteca nem `undefined`.
-- [ ] Erro de rate limit (429) devolve mensagem pedindo para tentar mais tarde.
-- [ ] `pnpm test` passa.
+- [x] Erro de rate limit (429) devolve mensagem pedindo para tentar mais tarde.
+- [x] `pnpm test` passa.
 
 ## Guia
 
@@ -113,3 +113,77 @@ comentário no arquivo avisando disso.
   comparar o módulo com ele mesmo e passar sempre (foi a lição do ticket 14 da Fundação).
 
 ## Comments
+
+### 2026-10-01 — Claude: feito, e a verificação achou um vazamento por tempo
+
+`src/features/auth/errors.ts` (`authErrorMessage`) + 18 testes. A verificação prática
+encontrou enumeração **pelo cronômetro** nos dois endpoints, corrigida com um piso de tempo
+de resposta (`src/lib/minimum-duration.ts` + `src/app/api/auth/[...all]/route.ts`).
+
+**1. Conteúdo da resposta: igual, como a spec dizia.** `curl` direto na API:
+
+| Login | Resposta |
+|---|---|
+| e-mail inexistente | 401 `INVALID_EMAIL_OR_PASSWORD` |
+| senha errada | 401 `INVALID_EMAIL_OR_PASSWORD` |
+
+**2. Tempo: NÃO era igual.** O hash falso da biblioteca empata o custo do scrypt, mas não o
+número de consultas ao banco. Medido em `dev`, requisições intercaladas:
+
+| Caso | Mediana | p10–p90 |
+|---|---|---|
+| login, e-mail inexistente | 75 ms | 67–81 |
+| login, senha errada | 86 ms | 79–92 |
+| cadastro, e-mail novo | 97 ms | 92–106 |
+| cadastro, e-mail repetido | 74 ms | 67–80 |
+
+Causa, conferida no código: no login, `findUserByEmail` com `includeAccounts` faz uma
+segunda consulta (as contas) só quando o usuário existe. No cadastro, só o e-mail novo grava
+`user` e `account`. Os intervalos quase não se sobrepõem: com algumas dezenas de amostras
+por e-mail, dá para separar os casos, mesmo com a oscilação da rede.
+
+**Correção:** `POST /api/auth/sign-in/email` e `/sign-up/email` respondem em no mínimo
+800ms, dando certo ou errado (`withMinimumDuration`, que também segura erro lançado).
+Depois:
+
+| Caso | Mediana | p10–p90 |
+|---|---|---|
+| login, inexistente / senha errada | 807 / 807 ms | 806–808 |
+| cadastro, novo / repetido | 806 / 806 ms | 806–810 |
+
+`get-session` e as outras rotas não passam pelo piso (8ms). A espera acontece depois de a
+consulta terminar, então não segura conexão de banco. O piso só protege enquanto o caminho
+mais lento ficar abaixo dele: **o ticket 15 mede em produção** (ver nota lá).
+
+Alternativas descartadas: atraso aleatório (a média de muitas amostras cancela o ruído);
+igualar o trabalho (exigiria mexer no código da biblioteca).
+
+**3. Conta banida não vira enumeração.** Banida no banco, com `banReason`:
+
+| Login da conta banida | Resposta |
+|---|---|
+| senha certa | 403 `BANNED_USER` (mensagem em inglês da biblioteca, sem o `banReason`) |
+| senha errada | 401 `INVALID_EMAIL_OR_PASSWORD` |
+
+O plugin confere o ban ao CRIAR a sessão, depois de a senha bater. Só quem já sabe a senha
+descobre o bloqueio.
+
+**Decisões do mapa:**
+
+- **Códigos tipados pela biblioteca:** `keyof typeof authClient.$ERROR_CODES` (núcleo) +
+  `keyof typeof ADMIN_ERROR_CODES` (`better-auth/client/plugins`), via `import type`.
+  Sabotagem: `BANNED_USERR` no mapa quebra o `tsc` (TS2561). O `$ERROR_CODES` não serve em
+  tempo de execução: na 1.7.6 é um proxy que monta chamada de API, não a lista.
+  `@better-auth/core` (onde mora `BASE_ERROR_CODES`) não é dependência direta, e o tipo
+  resolve sem acrescentá-la.
+- **429 decidido pelo status**, antes do código: o rate limiter responde sem `code`
+  (`api/rate-limiter/index.mjs`).
+- **Sem "e-mail já cadastrado"**: `USER_ALREADY_EXISTS*` cai na genérica de propósito
+  (testado), com comentário avisando quem for "ajudar o usuário".
+- **`Object.hasOwn` e não `in`**: com `in`, o código `"toString"` devolvia uma função.
+  Sabotagem confirmou: 4 testes falham com `in`.
+- **`INVALID_SIGN_UP_FIELDS`** (código do nosso hook) virou constante exportada daqui e
+  importada pelo `src/server/auth.ts`.
+- Assinatura `authErrorMessage({ code?, status })`: recebe só o que usa.
+
+Usuários de teste apagados.
