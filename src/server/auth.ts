@@ -4,6 +4,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
+import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/config/auth";
 import { prisma } from "@/server/db";
 import { env } from "@/server/env";
 
@@ -45,19 +46,13 @@ export const auth = betterAuth({
     enabled: true,
 
     /*
-      Mínimo de 8 e SEM regra de composição (maiúscula, símbolo...): composição empurra
-      todo mundo para `Senha@123`. O que protege é comprimento + checagem de senha vazada
-      (Feature 2).
-
-      O máximo é sobre CPU, não sobre o usuário: o hash de senha (scrypt) é lento de
-      propósito, e aceitar uma senha de 1 MB é deixar qualquer um ocupar o servidor com
-      poucas requisições.
-
-      Os mesmos números têm que estar no schema do formulário (ticket 06); se divergirem, o
-      formulário aceita o que o servidor recusa e a pessoa lê um erro em inglês.
+      Os números e o porquê de cada um estão em `src/config/auth.ts`. Eles vêm de lá, e não
+      escritos aqui, porque o schema do formulário (ticket 06) usa os mesmos: se
+      divergissem, o formulário aceitaria o que o servidor recusa e a pessoa leria um erro
+      em inglês.
     */
-    minPasswordLength: 8,
-    maxPasswordLength: 128,
+    minPasswordLength: PASSWORD_MIN_LENGTH,
+    maxPasswordLength: PASSWORD_MAX_LENGTH,
 
     /*
       Cadastro NÃO faz login. Além de ser o fluxo final (a Feature 2 exige e-mail

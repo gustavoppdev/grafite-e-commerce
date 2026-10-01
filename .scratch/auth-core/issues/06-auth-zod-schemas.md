@@ -1,6 +1,6 @@
 # 06 - Schemas de cadastro e login (Zod) e testes
 
-Status: open
+Status: resolved
 Responsável: ~~Gustavo~~ Claude
 Blocked by: -
 
@@ -28,15 +28,15 @@ formulário usa.
 
 ## Critérios de aceite
 
-- [ ] `signInSchema` recusa e-mail vazio, e-mail malformado e senha vazia, com mensagem
+- [x] `signInSchema` recusa e-mail vazio, e-mail malformado e senha vazia, com mensagem
       em pt-BR por campo.
-- [ ] `signUpSchema` recusa senha com menos de 8 caracteres e mais de 128, nome vazio e
+- [x] `signUpSchema` recusa senha com menos de 8 caracteres e mais de 128, nome vazio e
       nome só com espaços.
-- [ ] `signUpFormSchema` recusa `confirmPassword` diferente de `password`, e o erro aparece
+- [x] `signUpFormSchema` recusa `confirmPassword` diferente de `password`, e o erro aparece
       **no campo `confirmPassword`**, não como erro geral.
-- [ ] O tipo de `signUpSchema` **não** tem `confirmPassword` (é ele que o servidor importa).
-- [ ] E-mail é normalizado (espaços e caixa) antes de validar.
-- [ ] Teste por caso, nomes descritivos em inglês, `pnpm test` passa.
+- [x] O tipo de `signUpSchema` **não** tem `confirmPassword` (é ele que o servidor importa).
+- [x] E-mail é normalizado (espaços e caixa) antes de validar.
+- [x] Teste por caso, nomes descritivos em inglês, `pnpm test` passa.
 
 ## Guia
 
@@ -98,3 +98,49 @@ formulário usa.
   Pense em como o tipo do núcleo te obriga a separar em vez de você lembrar de separar.
 
 ## Comments
+
+### 2026-10-01 — Claude: feito
+
+`src/config/auth.ts` (constantes), `src/features/auth/schemas.ts` e
+`src/features/auth/schemas.test.ts` (30 testes). `src/server/auth.ts` passou a ler o mínimo
+e o máximo de senha das constantes.
+
+**Decisões:**
+
+- **Limites numa constante em `src/config/auth.ts`**, importada pelo servidor e pelo
+  schema. Entre "constante compartilhada" e "teste que falha se divergirem", a constante
+  torna a divergência impossível em vez de só detectável. Mora em `config/` porque o
+  navegador precisa dela, e nada de `server/` pode ir para o navegador.
+- **Nome: `trim` → `min(1)` → `max(100)` → sem caractere de controle.** O `trim` vem antes,
+  senão `"   "` passa no `min(1)`. 100 cabe qualquer nome real. Caracteres de controle
+  (`\r\n`, tab, NUL) são recusados contra injeção de cabeçalho no assunto de e-mail
+  (Feature 2) e falsificação de linha de log. Acentos, apóstrofo e hífen passam (testado).
+- **E-mail: `trim` + minúsculas antes do `z.email()`.** A garantia de verdade é do
+  better-auth, que grava e busca em minúsculas (`sign-up.mjs`, `sign-in.mjs`), então vale
+  para qualquer caminho de cadastro. O nosso é para o valor validado ser o mesmo que o
+  servidor grava. O `trim` é só nosso: a biblioteca não faz.
+- **Senha sem `trim`**: espaço é caractere válido de senha.
+- **Login sem o mínimo do cadastro**, só "não vazia" e o máximo (o servidor também impõe o
+  máximo no login: `assertPasswordNotTooLong` em `sign-in.mjs`). Há um teste que quebra se
+  alguém aplicar o mínimo no login.
+- **`confirmPassword`**: `.refine` no objeto, com `path: ["confirmPassword"]`. O teste
+  confere que o erro está no campo e que a lista de erros gerais está vazia.
+- **O tipo não basta para barrar `confirmPassword` no envio.** O TypeScript só reclama de
+  campo a mais em objeto literal; passar a variável inteira compila. Por isso o ticket 09
+  monta `{ name, email, password }` campo a campo. Está no comentário do schema.
+- Testes usam `z.flattenError()`. O `error.flatten()` está deprecado no Zod 4.
+
+**Sabotagem** (cada regra quebrada de propósito, uma por vez):
+
+| Sabotagem | Testes que falharam |
+|---|---|
+| `min(PASSWORD_MIN_LENGTH)` → `min(1)` | 1 |
+| `refine` sem `path` | 1 |
+| nome sem `trim` | 3 |
+| sem a regex de caractere de controle | 3 |
+| e-mail sem `toLowerCase` | 2 |
+
+**Descoberta para o doc de estudo:** no login, quando o e-mail não existe, o better-auth
+calcula o hash da senha mesmo assim (`sign-in.mjs`). Sem isso, "e-mail não existe"
+responderia mais rápido que "senha errada", e o tempo de resposta denunciaria quais e-mails
+têm conta (enumeração por tempo).
