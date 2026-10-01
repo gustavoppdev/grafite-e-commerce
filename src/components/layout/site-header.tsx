@@ -1,6 +1,12 @@
 import { SearchIcon, ShoppingBagIcon } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  AccountMenu,
+  AccountMenuFallback,
+  MobileAccountLinks,
+} from "./account-menu";
 import { Container } from "./container";
 import { Logo } from "./logo";
 import { MobileNav } from "./mobile-nav";
@@ -18,7 +24,14 @@ export function SiteHeader() {
       <Container className="grid h-15 grid-cols-[1fr_auto_1fr] items-center">
         <div className="flex items-center">
           <div className="md:hidden">
-            <MobileNav links={categoryLinks} />
+            <MobileNav
+              links={categoryLinks}
+              account={
+                <Suspense fallback={null}>
+                  <MobileAccountLinks />
+                </Suspense>
+              }
+            />
           </div>
 
           <nav aria-label="Categorias" className="hidden md:block">
@@ -50,6 +63,16 @@ export function SiteHeader() {
             <SearchIcon strokeWidth={1.25} className="size-5" />
             <span className="sr-only">Buscar</span>
           </Link>
+          {/*
+            Só no desktop: no celular, as opções de conta ficam no menu lateral. O
+            `<Suspense>` deixa o resto do header sair sem esperar a sessão; o fallback tem o
+            mesmo tamanho do ícone, para nada pular quando ela chega.
+          */}
+          <div className="hidden md:flex">
+            <Suspense fallback={<AccountMenuFallback />}>
+              <AccountMenu />
+            </Suspense>
+          </div>
           <Link
             href="/carrinho"
             className={buttonVariants({ variant: "ghost", size: "icon" })}

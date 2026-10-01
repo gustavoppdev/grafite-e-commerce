@@ -20,7 +20,14 @@ import type { NavLink } from "./navigation";
   Os links chegam por props, vindos do Server Component. Por isso eles precisam
   ser dados serializáveis (strings, números, objetos simples), nunca funções.
 */
-export function MobileNav({ links }: { links: NavLink[] }) {
+export function MobileNav({
+  links,
+  account,
+}: {
+  links: NavLink[];
+  // A parte da conta, renderizada no servidor (lê a sessão) e entregue pronta.
+  account?: React.ReactNode;
+}) {
   // Estado controlado para fechar o menu ao clicar num link: como a navegação
   // do Next não recarrega a página, o Sheet continuaria aberto sozinho.
   const [open, setOpen] = useState(false);
@@ -43,21 +50,38 @@ export function MobileNav({ links }: { links: NavLink[] }) {
           </SheetTitle>
         </SheetHeader>
 
-        <nav aria-label="Categorias">
-          <ul className="flex flex-col">
-            {links.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="block px-4 py-3 hover:bg-muted"
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/*
+          Fecha o menu quando QUALQUER link dentro dele é clicado, inclusive os da conta, que
+          chegam prontos do servidor e não têm como receber um `onClick` daqui.
+        */}
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: só observa cliques que acontecem nos links de dentro; não é um controle. */}
+        {/* biome-ignore lint/a11y/useKeyWithClickEvents: Enter num link também dispara `click`. */}
+        <div
+          onClick={(event) => {
+            if ((event.target as HTMLElement).closest("a")) setOpen(false);
+          }}
+        >
+          <nav aria-label="Categorias">
+            <ul className="flex flex-col">
+              {links.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="block px-4 py-3 hover:bg-muted"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {account && (
+            <nav aria-label="Conta" className="mt-4 border-t pt-2">
+              {account}
+            </nav>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );
