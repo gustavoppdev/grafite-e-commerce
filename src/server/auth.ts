@@ -5,6 +5,7 @@ import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from "@/config/auth";
+import { signUpSchema } from "@/features/auth/schemas";
 import { prisma } from "@/server/db";
 import { env } from "@/server/env";
 
@@ -165,7 +166,30 @@ export const auth = betterAuth({
         });
       }
 
-      // O `signUpSchema` do ticket 06 entra aqui, validando `name`, `email` e `password`.
+      /*
+        O mesmo schema do formulário, agora imposto no servidor. Quem é recusado aqui
+        passou por fora do formulário (que já teria avisado em pt-BR), então a resposta é
+        técnica: diz QUAIS campos falharam, nunca repete os valores recebidos.
+
+        `email` e `password` também são validados pela biblioteca logo depois. Rodar o
+        schema inteiro em vez de só o `name` é de propósito: uma regra, um lugar.
+      */
+      const parsed = signUpSchema.safeParse(ctx.body);
+      if (!parsed.success) {
+        const fields = [...new Set(parsed.error.issues.map((i) => i.path[0]))];
+        throw new APIError("BAD_REQUEST", {
+          code: "INVALID_SIGN_UP_FIELDS",
+          message: `invalid sign-up fields: ${fields.join(", ")}`,
+        });
+      }
+
+      /*
+        Devolver o corpo NORMALIZADO faz o endpoint gravar o valor limpo: nome sem espaços
+        nas pontas, e-mail sem espaços e em minúsculas. Sem isto, o hook validaria
+        " Ana " e o banco guardaria " Ana " mesmo assim. O better-auth mescla este `body`
+        sobre o original antes de chamar o endpoint (conferido em `api/dispatch.mjs`).
+      */
+      return { context: { body: { ...ctx.body, ...parsed.data } } };
     }),
   },
 

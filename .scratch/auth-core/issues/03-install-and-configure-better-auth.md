@@ -1,6 +1,6 @@
 # 03 - Instalar e configurar o better-auth
 
-Status: claimed
+Status: resolved
 Responsável: Claude
 Blocked by: 01
 
@@ -47,7 +47,7 @@ nunca vem do formulário, por que o ID não é sequencial.
       sem consulta ao banco). Verificação completa depende das tabelas (ticket 04).
 - [x] Nenhum import de `src/server/auth.ts` fora do servidor; `auth-client.ts` **não**
       importa nada de `src/server/`.
-- [ ] `curl -X POST /api/auth/sign-up/email` com `name` vazio (ou com 5 mil caracteres) é
+- [x] `curl -X POST /api/auth/sign-up/email` com `name` vazio (ou com 5 mil caracteres) é
       recusado **pelo servidor**, sem passar pelo formulário.
 - [x] **Verificado com `curl`**: cadastro com e-mail novo e cadastro com e-mail já
       existente devolvem o mesmo status (200), o mesmo conjunto de chaves na mesma ordem e
@@ -120,3 +120,32 @@ banReason, banExpires, id]`. Diferem só em `id`, `createdAt` e `updatedAt`.
 previsto na descoberta 1 acima.
 
 Falta só o critério do `name`, que espera o `signUpSchema` do ticket 06.
+
+### 2026-10-01 — Claude: `signUpSchema` no hook, ticket fechado
+
+O hook agora roda o `signUpSchema` (ticket 06) no `/sign-up/email` e devolve o corpo
+**normalizado** (`return { context: { body } }`): o endpoint grava o nome sem espaços nas
+pontas e o e-mail sem espaços e em minúsculas. Sem isso, o hook validaria `" Ana "` e o
+banco guardaria `" Ana "` do mesmo jeito.
+
+A recusa diz **quais** campos falharam (`code: "INVALID_SIGN_UP_FIELDS"`), nunca repete os
+valores. Roda o schema inteiro, não só o `name`: uma regra, um lugar. `email` e `password`
+continuam validados também pela biblioteca, logo depois.
+
+Verificado com `curl`, direto na API:
+
+| Corpo | Resultado |
+|---|---|
+| `name` vazio | 400 `invalid sign-up fields: name` |
+| `name` só com espaços | 400, idem |
+| `name` com 5 mil caracteres | 400, idem |
+| `name` com `\r\n` (injeção de cabeçalho) | 400, idem |
+| sem `name` | 400, idem |
+| `{}` | 400 `invalid sign-up fields: name, email, password` |
+| `"  Ana Teste  "` + `"  Dev-03B@Example.TEST "` | 200, gravado `"Ana Teste"` / `dev-03b@example.test` |
+| `image` no corpo | 400 (hook, como antes) |
+| `"role": "admin"` | 400 `FIELD_NOT_ALLOWED` (biblioteca, como antes) |
+
+A paridade contra enumeração foi reconferida com o hook novo: cadastro novo e cadastro
+repetido (este com o e-mail em maiúsculas e com espaços) devolvem as mesmas chaves, na mesma
+ordem, `token: null` e `role: "user"`. Usuários de teste apagados.
