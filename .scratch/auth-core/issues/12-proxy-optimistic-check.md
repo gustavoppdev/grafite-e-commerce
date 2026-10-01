@@ -35,3 +35,9 @@ Exemplo trabalhado: o `proxy.ts` do Next 16 (o antigo `middleware.ts`) usado do 
 - [ ] `pnpm lint`, `pnpm typecheck` e `pnpm build` passam.
 
 ## Comments
+
+### 2026-10-01 — Claude: nota vinda do ticket 11
+
+As rotas `/conta` e `/admin` já foram verificadas protegidas SEM proxy (ele ainda não
+existia). Depois de criar o `proxy.ts`, repetir com ele renomeado para provar o mesmo com o
+arquivo presente no projeto.

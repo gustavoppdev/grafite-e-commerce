@@ -89,7 +89,12 @@ export async function requireUser(): Promise<SessionUser> {
   Não usamos `forbidden()`/`unauthorized()` do Next: exigem `experimental.authInterrupts`,
   e flag experimental na base da autorização é risco sem retorno.
 */
-export async function requireAdmin(): Promise<SessionUser> {
+/*
+  Também em `cache()`: o layout, o `generateMetadata` e a página de `/admin` chamam esta
+  função na mesma requisição. O `cache()` guarda até o erro lançado pelo `notFound()`, então
+  as chamadas seguintes recusam igual, sem repetir a checagem e sem repetir a linha de log.
+*/
+export const requireAdmin = cache(async (): Promise<SessionUser> => {
   const user = await getSession();
   if (!user) notFound();
 
@@ -100,4 +105,4 @@ export async function requireAdmin(): Promise<SessionUser> {
   }
 
   return user;
-}
+});

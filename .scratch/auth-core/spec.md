@@ -181,6 +181,13 @@ usuário é convite a enumeração e a IDOR — `/conta/pedidos/124` depois de v
 uma área de administração naquele endereço; o 404 não confirma nada. Para quem não é Admin,
 `/admin` simplesmente não existe.
 
+> **Nuance medida no ticket 11:** o 404 não esconde que `/admin` existe. O link para `/admin`
+> está no JavaScript do menu da conta, que todo visitante baixa, e a 404 de uma rota que
+> existe tem estrutura diferente da 404 de uma URL inexistente (o Next a renderiza por outro
+> caminho). O que o 404 faz é não *anunciar*, e o que realmente importa é outro ponto:
+> **nenhuma interface de administração é renderizada para quem não é Admin**, nem no
+> payload. A proteção é o `requireAdmin()`, não o segredo do endereço.
+
 Mas o 404 esconde a recusa de **nós** também: um Admin que perdeu o papel (bug, ban, script
 do ticket 14 rodado errado) reporta "o site quebrou", e você depura autorização olhando um
 404. Por isso o 404 vem com uma emenda obrigatória: **`requireAdmin` registra no log do
