@@ -19,7 +19,8 @@ Cada feature é entregável sozinha e vai para produção (Vercel) ao terminar. 
 
 ## Estrutura de pastas
 
-Definida na Fundação e descrita em `.scratch/foundation/spec.md`. Regra central:
+Documento vivo em `docs/structure.md` (árvore atual, onde cada arquivo vai, direção dos
+imports). Regra central:
 `src/server/` é a fronteira de segurança — todo arquivo lá dentro tem `import "server-only"`,
 nenhum fora tem.
 
@@ -38,6 +39,13 @@ nenhum fora tem.
   neutro com a loja inteira estática, ou **(c)** casca neutra estática + Client Component
   que troca para o nome na hidratação via `authClient.useSession()` — cache preservado e
   nome na tela. A (c) é provavelmente a resposta final.
+
+- **Feature 2 (Auth: segurança da conta):** com `esqueci-a-senha`, `redefinir-senha` e
+  `verificar-email`, a loja passa a ter 5 telas de autenticação soltas em `(store)`. É aí
+  que um grupo `(store)/(auth)/` com `layout.tsx` próprio (a coluna estreita da `AuthCard`)
+  passa a compartilhar algo de verdade. Na Feature 1 foi considerado e adiado: com 2 telas,
+  e o cadastro trocando o título no meio do fluxo, o grupo seria só uma pasta a mais.
+  `/conta` não entra nele: é a área da pessoa, não autenticação.
 
 - **Feature 2 (Auth: segurança da conta):** o rate limit da Feature 1 conta por
   `${ip}|${path}`, então 100 IPs testam 100× mais senhas na mesma conta. Contar por e-mail é

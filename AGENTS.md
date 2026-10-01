@@ -50,6 +50,10 @@ Ticket status flow: `open` → `claimed` (work started) → `resolved`. Update t
 
 Issues and specs live as markdown files under `.scratch/<feature-slug>/`. See `docs/agents/issue-tracker.md`.
 
+### Project structure
+
+Where each file goes and which folders may import which: `docs/structure.md`. Keep it updated when a feature adds a folder or a rule.
+
 ### Domain docs
 
 Single-context: `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

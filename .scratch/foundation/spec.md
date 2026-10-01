@@ -22,6 +22,9 @@ Ao final, abrir a URL da Vercel mostra a home vazia da loja com header e footer,
 
 ### Estrutura de pastas
 
+> **Atualizado:** a versão viva desta seção, com a árvore atual e as regras de import, está
+> em `docs/structure.md`. O texto abaixo é o registro do que a Fundação planejou.
+
 ```
 src/
 ├── app/                      rotas finas: só compõem features e componentes
