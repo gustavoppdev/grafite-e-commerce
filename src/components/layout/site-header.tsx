@@ -6,7 +6,7 @@ import {
   AccountMenu,
   AccountMenuFallback,
   MobileAccountLinks,
-} from "./account-menu";
+} from "@/features/auth/components/account-menu";
 import { Container } from "./container";
 import { Logo } from "./logo";
 import { MobileNav } from "./mobile-nav";

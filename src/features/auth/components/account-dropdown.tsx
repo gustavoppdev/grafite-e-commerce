@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOutAction } from "@/features/auth/actions";
+import { signOutAction } from "../actions";
 
 /*
   O menu aberto pelo ícone de conta. É Client Component porque abrir e fechar é estado no

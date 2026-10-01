@@ -17,6 +17,10 @@ import { env } from "@/server/env";
   Mora em `src/server/` porque carrega o segredo que assina o cookie e o cliente do banco:
   se chegasse ao navegador, qualquer pessoa conseguiria forjar sessão. O formulário fala
   com ela por HTTP, pelo `auth-client.ts` — nunca importando este arquivo (ADR 0005).
+
+  Uma proteção de auth mora FORA deste arquivo: o tempo mínimo de resposta do login e do
+  cadastro (contra descobrir pelo cronômetro quem tem conta) fica no route handler,
+  `src/app/api/auth/[...all]/route.ts`, porque age sobre a resposta HTTP.
 */
 
 /*

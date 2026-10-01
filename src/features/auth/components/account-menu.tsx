@@ -1,8 +1,8 @@
 import { UserIcon } from "lucide-react";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { signOutAction } from "@/features/auth/actions";
 import { getSession } from "@/server/session";
+import { signOutAction } from "../actions";
 import { AccountDropdown } from "./account-dropdown";
 
 /*
