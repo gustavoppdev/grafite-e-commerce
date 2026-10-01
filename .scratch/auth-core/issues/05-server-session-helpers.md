@@ -1,6 +1,6 @@
 # 05 - Sessão no servidor: `getSession`, `requireUser`, `requireAdmin`
 
-Status: open
+Status: resolved
 Responsável: Claude
 Blocked by: 04
 
@@ -26,13 +26,13 @@ página/action/query e não só no `proxy.ts` (ADR 0003 e CVE-2025-29927), e por
 
 ## Critérios de aceite
 
-- [ ] `getSession()` chamada duas vezes na mesma requisição faz **uma** consulta
+- [x] `getSession()` chamada duas vezes na mesma requisição faz **uma** consulta
       (verificar com log de query do Prisma).
-- [ ] `requireUser()` sem sessão redireciona para `/entrar`.
-- [ ] `requireAdmin()` como Cliente cai no `not-found.tsx` **e** deixa uma linha no log do
+- [x] `requireUser()` sem sessão redireciona para `/entrar`.
+- [x] `requireAdmin()` como Cliente cai no `not-found.tsx` **e** deixa uma linha no log do
       servidor com o id de quem tentou; como Visitante, não loga nada (não há id).
-- [ ] Nada em `src/server/session.ts` é importável de Client Component (o build quebra).
-- [ ] `pnpm lint`, `pnpm typecheck` e `pnpm build` passam.
+- [x] Nada em `src/server/session.ts` é importável de Client Component (o build quebra).
+- [x] `pnpm lint`, `pnpm typecheck` e `pnpm build` passam.
 
 ## Notas
 
@@ -42,3 +42,42 @@ página/action/query e não só no `proxy.ts` (ADR 0003 e CVE-2025-29927), e por
   Components. Nunca `role` a mais do que o necessário, nunca campo de ban, nunca hash.
 
 ## Comments
+
+### 2026-10-01 — Claude: feito e verificado
+
+`src/server/session.ts` com `getSession` (em `cache()`), `requireUser`, `requireAdmin` e o
+tipo `SessionUser` (`id`, `name`, `email`, `role`).
+
+**Decisões:**
+
+- **Retorno enxuto (DTO).** Copiamos só `id`, `name`, `email` e `role`, em vez de repassar
+  o `session.user` do better-auth. O que sai daqui pode virar prop de Client Component, que
+  é serializada no HTML. Um campo novo na tabela (ou os de ban) só aparece se alguém o
+  acrescentar de propósito no tipo.
+- **`role` normalizado para `"user" | "admin"`.** O plugin admin guarda texto e aceita
+  vários papéis separados por vírgula. `toRole` confere igual ao plugin
+  (`plugins/admin/routes.mjs`, `split(",")`), para os dois nunca discordarem sobre quem é
+  Admin. Qualquer outro valor, inclusive `null`, vira `"user"`: na dúvida, o menor
+  privilégio.
+- **Log da recusa só com o id**, via `console.warn` (vai para os logs da Vercel). Nome e
+  e-mail são dado pessoal e não precisam estar no log.
+- **Refresh da sessão em Server Component** é tratado pela biblioteca: o `nextCookies()`
+  detecta requisição RSC e pula o refresh, porque ali não dá para gravar cookie
+  (`integrations/next-js.mjs`). Nada a fazer do nosso lado.
+
+**Verificação** (páginas temporárias + log de query do Prisma, tudo removido depois):
+
+| Cenário | Resultado |
+|---|---|
+| `getSession()` 2× na mesma requisição (página + componente filho) | 1 leitura de sessão: 2 SELECTs (`session` + `user`) |
+| Prova contrária: `auth.api.getSession` 2× sem `cache()` | 2 leituras: 4 SELECTs |
+| Visitante: `getSession()` | nenhuma query (sem cookie, a biblioteca nem vai ao banco) |
+| `requireUser()` como Visitante | 307 → `/entrar` |
+| `requireUser()` logado | 200 |
+| `requireAdmin()` como Visitante | 404, nenhuma linha de log |
+| `requireAdmin()` como Cliente | 404 + `[auth] requireAdmin recusou o usuário <id>` |
+| Client Component importando `@/server/session` | build quebra no `server-only` |
+
+O usuário de teste (`dev-05@example.test`) foi apagado depois; sessões e conta foram junto
+pelo `onDelete: Cascade`. `/entrar` ainda não existe (ticket 08), então o redirect cai no
+404 por enquanto.
