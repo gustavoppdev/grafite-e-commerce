@@ -33,6 +33,7 @@ src/
 ├── server/                       SÓ SERVIDOR: env, db, auth, session
 ├── config/                       valores do projeto: env.schema, site, limites, headers
 ├── lib/                          funções puras, sem I/O, testáveis
+├── proxy.ts                      redireciona para o login sem consultar nada (conveniência, ADR 0003)
 └── generated/                    Prisma Client (gerado, fora do git)
 prisma/                           schema.prisma + migrations/
 certs/                            CA do Supabase (pública, usada no TLS)

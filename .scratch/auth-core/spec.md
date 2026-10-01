@@ -208,7 +208,10 @@ Roda em toda requisição, então faz **só checagem otimista**: olha se o cooki
 existe, sem validar nada no banco.
 
 - `/conta/*` e `/admin/*` sem cookie → `/entrar?next=<pathname>`.
-- Com cookie em `/entrar` ou `/cadastro` → `/conta`.
+- ~~Com cookie em `/entrar` ou `/cadastro` → `/conta`.~~ **Removida no ticket 12:** com um
+  cookie que existe mas não vale (vencido, encerrado, inventado), essa regra e o
+  `requireUser()` mandavam a pessoa de uma página para a outra até o navegador desistir. As
+  páginas já redirecionam quem está logado, com a sessão validada no banco. Ver ADR 0003.
 - **Não checa papel.** O papel está no banco, e o proxy não consulta banco: ele roda até em
   prefetch de link, e uma query ali multiplica carga por navegação.
 
@@ -344,7 +347,7 @@ Resposta ao estourar: **429** com o header `X-Retry-After` (não `Retry-After`).
 | `/entrar` | `(store)` | público; com sessão, redireciona |
 | `/cadastro` | `(store)` | público; com sessão, redireciona |
 | `/conta` | `(store)` | Cliente |
-| `/admin` | `(admin)` | Admin (404 para os outros) |
+| `/admin` | `(admin)` | Admin; Cliente recebe 404; Visitante vai para o login (proxy) |
 | `/api/auth/*` | – | público, do better-auth |
 
 - `/entrar` e `/cadastro` ficam dentro de `(store)`: são páginas da loja e têm header e
@@ -396,7 +399,8 @@ As duas alternativas, escritas aqui para a Feature 5 não redescobrir o problema
 - [ ] Sair limpa o cookie e volta para a home; `/conta` volta a exigir login.
 - [ ] `/conta` deslogado vai para `/entrar?next=/conta` e, depois do login, volta para `/conta`.
 - [ ] `/entrar?next=https://exemplo.invalido` e `?next=//exemplo.invalido` **não** saem do site.
-- [ ] `/admin` responde 404 para Visitante e para Cliente; abre para Admin.
+- [ ] `/admin` responde 404 para Cliente e abre para Admin. Visitante vai para
+      `/entrar?next=/admin` pelo proxy; sem o proxy, recebe 404 (ticket 12).
 - [ ] Renomear `proxy.ts` e `/conta` continua protegida (a defesa real não está nele).
 - [ ] Tentar login várias vezes seguidas devolve 429 antes do limite global.
 - [ ] Cookie de sessão em produção: `HttpOnly`, `Secure`, `SameSite=Lax`.
