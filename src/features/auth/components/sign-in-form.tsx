@@ -11,6 +11,7 @@ import { authRequest } from "../auth-request";
 import { signInSchema } from "../schemas";
 import { AuthField } from "./auth-field";
 import { focusField } from "./focus-field";
+import { PasswordField } from "./password-field";
 
 export function SignInForm({ redirectTo }: { redirectTo: string }) {
   const router = useRouter();
@@ -108,10 +109,9 @@ export function SignInForm({ redirectTo }: { redirectTo: string }) {
         spellCheck={false}
         error={fieldErrors.email?.[0]}
       />
-      <AuthField
+      <PasswordField
         label="Senha"
         name="password"
-        type="password"
         autoComplete="current-password"
         error={fieldErrors.password?.[0]}
       />

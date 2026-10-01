@@ -11,6 +11,7 @@ import { signUpFormSchema } from "../schemas";
 import { AuthCard } from "./auth-card";
 import { AuthField } from "./auth-field";
 import { focusField } from "./focus-field";
+import { PasswordField } from "./password-field";
 
 /*
   O cadastro inteiro, inclusive a moldura: depois do envio, título, texto e rodapé trocam
@@ -114,17 +115,15 @@ export function SignUpForm({ signInHref }: { signInHref: string }) {
           `new-password` nos dois campos de senha: o gerenciador de senhas entende que é
           cadastro e oferece GERAR uma senha forte, em vez de preencher uma que já existe.
         */}
-        <AuthField
+        <PasswordField
           label="Senha"
           name="password"
-          type="password"
           autoComplete="new-password"
           error={fieldErrors.password?.[0]}
         />
-        <AuthField
+        <PasswordField
           label="Confirme a senha"
           name="confirmPassword"
-          type="password"
           autoComplete="new-password"
           error={fieldErrors.confirmPassword?.[0]}
         />

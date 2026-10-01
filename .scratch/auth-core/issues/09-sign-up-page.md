@@ -99,3 +99,24 @@ no `html` (a barra de rolagem aparece sem deslocar a página para o lado).
 No navegador, o cadastro novo levou 1,8s e o repetido 1,3s. Não é vazamento: medido direto
 no servidor, os dois empatam (tabela acima). A diferença é do navegador na primeira
 requisição da página, e quem tenta enumerar só enxerga o tempo do servidor.
+
+### 2026-10-01 — Claude: botão de mostrar a senha (pedido na revisão)
+
+`components/password-field.tsx`, usado no login e nos dois campos de senha do cadastro. A
+`AuthField` ganhou um `action` (botão encostado à direita, com `pr-11` no campo).
+
+O mecanismo é só `type="password"` ↔ `type="text"`. Os cuidados em volta:
+
+- `type="button"`: dentro de `<form>` o padrão é `submit`, e o clique enviaria o formulário.
+- `autoCapitalize="none"`, `autoCorrect="off"`, `spellCheck={false}`: como texto, o corretor
+  do celular "consertaria" a senha, o teclado poria maiúscula, e o corretor avançado do
+  Chrome/Edge pode enviar o conteúdo do campo para os servidores deles.
+- Volta a esconder no `submit` do formulário (listener no `form`, via `button.form`):
+  gerenciador de senhas reconhece o campo pelo `type="password"`, e a senha não fica
+  exposta na tela depois do envio.
+- Rótulo fixo "Mostrar senha" + `aria-pressed`, em vez de trocar o rótulo (as duas coisas
+  juntas se contradiriam no leitor de tela). O botão entra na ordem do Tab, entre a senha e
+  o envio, e responde a Espaço.
+
+Verificado no Chrome headless: alterna sem disparar POST, volta a `password` no envio,
+`aria-pressed` acompanha, depois do erro de login a senha vazia continua oculta e focada.
