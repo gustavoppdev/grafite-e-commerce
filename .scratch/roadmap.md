@@ -45,7 +45,7 @@ nenhum fora tem.
   comparar com o Turnstile, que ataca o mesmo cenário sem contador de concorrência nosso.
   Decidir lá, com as duas opções na mesa.
 
-- **Feature 5 (Catálogo):** `src/app/(store)/loading.tsx` faz toda página da loja responder em streaming, então `notFound()` (ex. Produto inexistente ou arquivado) devolve HTTP 200 + `noindex` em vez de 404. A Feature 1 **remove** esse `loading.tsx` (ticket 08: ele é um skeleton de grade de produtos e piscaria no login), o que deve devolver o 404 real. Cada segmento ganha o seu `loading.tsx` a partir da Feature 5.
+- ~~**Feature 5 (Catálogo):** `src/app/(store)/loading.tsx` fazia `notFound()` responder 200.~~ **Resolvida na Feature 1 (ticket 08):** o `loading.tsx` do grupo saiu e `notFound()` numa rota da loja voltou a responder 404 (conferido). Ao criar um `loading.tsx` de segmento na Feature 5, lembrar que ele devolve o problema para as páginas abaixo dele.
 
 ## Decisões transversais
 

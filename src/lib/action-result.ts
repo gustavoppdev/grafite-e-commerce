@@ -66,6 +66,14 @@ export function failValidation(
   error: ZodError,
   message = "Confira os campos destacados.",
 ): ActionResult<never> {
+  return fail(message, toFieldErrors(error));
+}
+
+/*
+  A conversão sozinha, para formulário que valida no navegador e não passa por action
+  (login e cadastro, que falam com o `authClient`). Mesmo formato, mesma tela de erro.
+*/
+export function toFieldErrors(error: ZodError): FieldErrors {
   const fieldErrors: FieldErrors = {};
 
   for (const issue of error.issues) {
@@ -76,5 +84,5 @@ export function failValidation(
     fieldErrors[field].push(issue.message);
   }
 
-  return fail(message, fieldErrors);
+  return fieldErrors;
 }
