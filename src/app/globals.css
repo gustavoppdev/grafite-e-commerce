@@ -115,6 +115,13 @@
 
   html {
     @apply font-sans;
+    /*
+      Reserva o espaço da barra de rolagem desde o início. Em sistemas onde ela ocupa
+      espaço (Windows, Linux), a página que passa a rolar (um erro de formulário, um filtro
+      que mostra mais produtos) ficaria ~15px mais estreita, e tudo que é centralizado
+      deslizaria para o lado. Assim a barra aparece sem empurrar nada.
+    */
+    scrollbar-gutter: stable;
   }
 
   body {

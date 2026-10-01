@@ -7,6 +7,11 @@ import { cn } from "cn";
 
   Coluna estreita e centrada: um formulário curto esticado na largura da página fica com
   campos de 1000px para digitar um e-mail, e o olho perde a linha.
+
+  Alinhada pelo TOPO, com respiro fixo, e não centralizada na vertical. Centralizada,
+  cada mensagem de erro que aparece aumenta a altura do bloco, o centro é recalculado e
+  tudo sobe junto, inclusive o título e os campos que não mudaram. Pelo topo, a mensagem
+  só empurra o que está abaixo dela.
 */
 export function AuthCard({
   title,
@@ -24,7 +29,7 @@ export function AuthCard({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-8 px-4 py-16 sm:py-24",
+        "mx-auto flex w-full max-w-sm flex-col gap-8 px-4 py-16 sm:py-24",
         className,
       )}
     >
