@@ -10,7 +10,7 @@ import { cn } from "cn";
   O foco visível vem do `:focus-visible` global em `globals.css`, por isso não há
   `outline-none` nem anéis de foco próprios aqui.
 */
-const buttonVariants = cva(
+const buttonVariantClasses = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-normal whitespace-nowrap transition-colors select-none disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
@@ -47,16 +47,29 @@ const buttonVariants = cva(
   },
 );
 
+/*
+  `cva` só CONCATENA as classes: a base traz `border-transparent` e a variante padrão traz
+  `border-foreground`, e as duas iam juntas para o HTML. No CSS gerado, `border-transparent`
+  vem depois e vence, então um `<Link className={buttonVariants()}>` saía sem borda. O `cn`
+  resolve o conflito (a classe passada por último ganha), e por isso TODO uso passa por ele,
+  não só o `<Button>`.
+*/
+function buttonVariants(
+  props?: Parameters<typeof buttonVariantClasses>[0],
+): string {
+  return cn(buttonVariantClasses(props));
+}
+
 function Button({
   className,
   variant = "default",
   size = "default",
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariantClasses>) {
   return (
     <ButtonPrimitive
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={buttonVariants({ variant, size, className })}
       {...props}
     />
   );
