@@ -50,6 +50,28 @@ function createPrismaClient() {
   const adapter = new PrismaPg({
     connectionString: env.DATABASE_URL,
     ssl: { ca: supabaseCa },
+
+    /*
+      Timeouts. O padrão do `pg` é esperar PARA SEMPRE: se o pooler não responde ou uma
+      query trava (esperando um lock, por exemplo), a requisição fica presa até a Vercel
+      matar a função, segurando uma conexão do pool enquanto isso. Com várias presas ao
+      mesmo tempo, o pool esgota e a loja inteira para de responder, não só uma página.
+
+      - `connectionTimeoutMillis`: desiste de ABRIR conexão depois de 5s.
+      - `query_timeout`: desiste de ESPERAR uma query depois de 10s. Quem cronometra é o
+        próprio driver, do nosso lado.
+
+      Por que não `statement_timeout`, que faria o próprio Postgres cancelar a query:
+      testado, o pooler do Supabase em transaction mode IGNORA esse parâmetro vindo do
+      cliente (`show statement_timeout` continuou em `2min`, o padrão que o Supabase já
+      configura no banco). Então o banco ainda corta sozinho em 2 minutos, e nós paramos de
+      esperar bem antes disso.
+
+      10s é folgado para uma loja (as consultas daqui levam milissegundos). Se uma operação
+      futura precisar de mais, aumente para ela, não para todas.
+    */
+    connectionTimeoutMillis: 5_000,
+    query_timeout: 10_000,
   });
   return new PrismaClient({ adapter });
 }
