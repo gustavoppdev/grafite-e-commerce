@@ -1,6 +1,9 @@
 allowBuilds:
   # Baixa o schema engine oficial (binaries.prisma.sh), usado por `prisma migrate`.
   '@prisma/engines': true
+  # Dependência do `tsx` (scripts/). O postinstall só confere o binário da plataforma, que o
+  # pnpm já instala como dependência opcional: o `tsx` roda sem ele (testado).
+  esbuild: false
   # Só verifica versão de Node/ambiente antes de instalar.
   prisma: true
   sharp: false

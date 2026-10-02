@@ -2,6 +2,7 @@ import "server-only";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { cache } from "react";
+import { type Role, toRole } from "@/lib/roles";
 import { auth } from "@/server/auth";
 
 /*
@@ -32,19 +33,9 @@ export type SessionUser = {
   id: string;
   name: string;
   email: string;
-  role: "user" | "admin";
+  // Lido por `toRole` (`src/lib/roles.ts`): `null` ou valor estranho vira "user".
+  role: Role;
 };
-
-/*
-  O plugin admin guarda o papel como texto, e aceita vários separados por vírgula
-  ("admin,user"). Conferimos do mesmo jeito que ele (`plugins/admin/routes.mjs`), senão o
-  plugin e a loja discordariam sobre quem é Admin. Qualquer outro valor — inclusive
-  `null` — vira "user": na dúvida, o menor privilégio.
-*/
-function toRole(role: string | null | undefined): SessionUser["role"] {
-  const roles = (role ?? "").split(",").map((r) => r.trim());
-  return roles.includes("admin") ? "admin" : "user";
-}
 
 /*
   `cache()` do React: dentro de UMA requisição, a primeira chamada vai ao banco e as

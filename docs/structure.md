@@ -36,6 +36,7 @@ src/
 ├── proxy.ts                      redireciona para o login sem consultar nada (conveniência, ADR 0003)
 └── generated/                    Prisma Client (gerado, fora do git)
 prisma/                           schema.prisma + migrations/
+scripts/                          tarefas de operador, rodadas no terminal (`pnpm admin:promote`)
 certs/                            CA do Supabase (pública, usada no TLS)
 docs/                             ADRs, este arquivo, instruções dos agentes
 .scratch/                         roadmap, specs e tickets de cada feature
@@ -52,6 +53,7 @@ docs/                             ADRs, este arquivo, instruções dos agentes
 | É peça visual genérica, sem saber de domínio? | `components/common/` |
 | É parte da casca da loja (header, footer)? | `components/layout/` |
 | É uma URL? | `app/` |
+| É tarefa de operador (só quem tem acesso ao banco pode fazer)? | `scripts/` |
 
 Na dúvida entre `features/` e `components/common/`: comece na feature. Só promova para
 `common/` quando uma SEGUNDA feature precisar, e aí o formato certo já é conhecido.
@@ -75,6 +77,10 @@ components/layout/  ──►  features/   (só para encaixar peças na casca: m
 - **`components/ui` e `components/common` não importam nada do domínio** (`features/`,
   `server/`). `components/layout` pode importar de `features/` para compor a casca.
 - **`lib/` e `config/` não importam nada do projeto.** São as folhas da árvore.
+- **`scripts/` não importa `src/server/`.** Um script é outro processo (Node comum, via
+  `tsx`), e o `server-only` lançaria erro. Ele monta a própria conexão, com as mesmas
+  garantias do `server/db.ts` (TLS validado, timeout), e pode importar `lib/`, `config/` e
+  `generated/`. Nada em `src/` importa de `scripts/`.
 - Uma feature não importa outra. Se precisar, o pedaço compartilhado sobe para `lib/`,
   `config/` ou `components/common/`.
 
@@ -91,6 +97,8 @@ components/layout/  ──►  features/   (só para encaixar peças na casca: m
 - **Autorização na página, não no layout.** Layout não roda de novo a cada navegação e não
   impede as páginas de baixo de rodarem (ADR 0003). Um layout pode checar a MAIS, para não
   renderizar interface restrita (ver `(admin)/layout.tsx`), mas nunca no lugar da página.
+- **Tarefa de operador nunca vira rota nem server action.** Promover Admin, por exemplo:
+  uma tela para isso teria que funcionar sem ser Admin, ou seja, seria pública.
 - **Route handler fino**, com uma exceção aceita: o que age sobre a resposta HTTP pode
   morar nele (o piso de tempo em `api/auth/[...all]/route.ts`), com um ponteiro no arquivo
   de configuração correspondente.
