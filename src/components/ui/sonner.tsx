@@ -33,12 +33,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }
       toastOptions={{
         classNames: {
-          /*
-            O sonner injeta o próprio CSS em runtime, depois da nossa folha de estilo,
-            então a sombra dele venceria a nossa classe por ordem de declaração. O `!`
-            (`!shadow-none`) marca a regra como `!important` e resolve — é a exceção que
-            se justifica quando o estilo vem de uma biblioteca de terceiros.
-          */
+          // O CSS do sonner é injetado depois do nosso: só `!important` vence a sombra dele.
           toast: "!shadow-none rounded-none",
           title: "font-normal",
           description: "text-meta text-muted-foreground",

@@ -8,24 +8,14 @@ import { Label } from "@/components/ui/label";
 import { NewsletterForm } from "@/features/demo/components/newsletter-form";
 import { formatPrice } from "@/lib/format";
 
-/*
-  Referência visual viva da loja: todo elemento do vocabulário visual num lugar só.
-  Fica FORA do grupo `(store)`, então não herda header nem footer — é ferramenta de
-  desenvolvimento, não página da loja.
-
-  Serve para três coisas: decidir espaçamento e contraste vendo lado a lado, conferir
-  se um token novo não quebrou nada, e ser o lugar onde se testa um componente antes
-  de colocá-lo numa tela de verdade.
-*/
+// Referência visual da loja (ferramenta de desenvolvimento, fora do grupo `(store)`).
 
 export const metadata = {
   title: "Design system",
-  // Mesmo com o 404 em produção, avisamos os buscadores para não indexarem em
-  // nenhum ambiente — preview da Vercel, ambiente de teste futuro, o que aparecer.
+  // Não indexar em nenhum ambiente (preview incluído), mesmo com o 404 em produção.
   robots: { index: false, follow: false },
 };
 
-// Cabeçalho de seção: mesmo tratamento em todas, para a página ter ritmo previsível.
 function Section({
   title,
   description,
@@ -48,19 +38,12 @@ function Section({
   );
 }
 
-// Nome de classe ou de token no meio do texto. Fundo `muted` para destacar do corpo.
 function Code({ children }: { children: React.ReactNode }) {
   return <code className="bg-muted px-1 text-meta">{children}</code>;
 }
 
-/*
-  As classes de cor são escritas por extenso de propósito.
-
-  O Tailwind varre o código procurando nomes de classe como TEXTO; ele não executa
-  nada. Uma classe montada em runtime (`` `bg-${token}` ``) não existe no arquivo e o
-  CSS correspondente nunca é gerado — o quadrado sairia transparente. Por isso a lista
-  repete `bg-background`, `bg-foreground`... em vez de derivar do nome do token.
-*/
+// Classes por extenso: o Tailwind lê o código como texto, e `bg-${token}` montado em
+// runtime nunca geraria o CSS.
 const colorTokens = [
   { className: "bg-background", token: "background", use: "fundo da loja" },
   {
@@ -84,8 +67,7 @@ const colorTokens = [
   { className: "bg-destructive", token: "destructive", use: "erros" },
 ];
 
-// Bloco de Produto. Vira componente de verdade em `src/features/products/` na Feature 4;
-// aqui é só a forma visual, para acertar proporção e espaçamento antes.
+// Só a forma visual do Produto; o componente de verdade vem com o catálogo.
 function ProductBlock({
   name,
   cents,
@@ -97,11 +79,7 @@ function ProductBlock({
 }) {
   return (
     <article className="flex flex-col gap-3">
-      {/*
-        A loja não tem imagens: o Produto é um retângulo `bg-muted` em proporção retrato.
-        `aspect-3/4` reserva a altura ANTES de qualquer conteúdo chegar, então a grade
-        nunca "pula" (layout shift). É a mesma proporção do skeleton de carregamento.
-      */}
+      {/* `aspect-3/4` reserva a altura antes do conteúdo: a grade não pula (layout shift). */}
       <div className="relative aspect-3/4 w-full bg-muted">
         {soldOut && (
           <span className="absolute bottom-0 left-0 bg-background px-2 py-1 text-meta text-muted-foreground">
@@ -110,7 +88,6 @@ function ProductBlock({
         )}
       </div>
 
-      {/* Nome e preço na mesma linha, nas pontas: o olho varre a coluna de preços reta. */}
       <div className="flex justify-between gap-4">
         <h3 className={soldOut ? "text-subtle-foreground" : undefined}>
           {name}
@@ -128,14 +105,8 @@ function ProductBlock({
 }
 
 export default function DesignSystemPage() {
-  /*
-    404 em produção: esta página expõe o vocabulário visual e um formulário de teste.
-    Nada secreto, mas rota interna de pé em produção é superfície de ataque de graça —
-    e uma página assim costuma ser o primeiro lugar onde se procura endpoint esquecido.
-
-    O `NODE_ENV` é fixado pelo Next no build (`production` em `next build`), então esta
-    comparação vira constante e a página some do bundle de produção.
-  */
+  // 404 em produção: rota interna no ar é superfície de ataque de graça. O `NODE_ENV` é
+  // constante no build, então a página some do bundle.
   if (process.env.NODE_ENV === "production") {
     notFound();
   }
@@ -202,7 +173,6 @@ export default function DesignSystemPage() {
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           {colorTokens.map((color) => (
             <li key={color.token} className="flex flex-col gap-2">
-              {/* A borda existe para o quadrado branco (`background`) não sumir no fundo. */}
               <div
                 className={`aspect-square w-full border ${color.className}`}
               />
@@ -230,7 +200,6 @@ export default function DesignSystemPage() {
           <Button disabled>Indisponível</Button>
         </div>
 
-        {/* Ação principal de uma tela ocupa a largura toda: não há dúvida do que fazer. */}
         <Button className="w-full">Finalizar compra</Button>
       </Section>
 

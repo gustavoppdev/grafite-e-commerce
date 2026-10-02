@@ -2,14 +2,7 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "cn";
 
-/*
-  O estilo da loja mora aqui, nas variantes, e não em classes repetidas em cada tela.
-  Quem usa escreve só `<Button>` ou `<Button variant="ghost">`; se o visual mudar,
-  muda neste arquivo e o site inteiro acompanha.
-
-  O foco visível vem do `:focus-visible` global em `globals.css`, por isso não há
-  `outline-none` nem anéis de foco próprios aqui.
-*/
+// O estilo da loja mora nas variantes. O foco visível vem do `:focus-visible` global.
 const buttonVariantClasses = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-normal whitespace-nowrap transition-colors select-none disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
@@ -47,13 +40,8 @@ const buttonVariantClasses = cva(
   },
 );
 
-/*
-  `cva` só CONCATENA as classes: a base traz `border-transparent` e a variante padrão traz
-  `border-foreground`, e as duas iam juntas para o HTML. No CSS gerado, `border-transparent`
-  vem depois e vence, então um `<Link className={buttonVariants()}>` saía sem borda. O `cn`
-  resolve o conflito (a classe passada por último ganha), e por isso TODO uso passa por ele,
-  não só o `<Button>`.
-*/
+// `cva` só concatena: sem o `cn`, `border-transparent` da base vencia a borda da variante
+// em `<Link className={buttonVariants()}>`.
 function buttonVariants(
   props?: Parameters<typeof buttonVariantClasses>[0],
 ): string {

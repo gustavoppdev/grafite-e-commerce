@@ -12,11 +12,7 @@ import { Logo } from "./logo";
 import { MobileNav } from "./mobile-nav";
 import { categoryLinks } from "./navigation";
 
-/*
-  Server Component (sem "use client"): o HTML do header chega pronto do servidor
-  e não manda JavaScript para o navegador. Só o <MobileNav>, que tem estado,
-  é client. Regra prática: empurre o "use client" para as folhas da árvore.
-*/
+// Server Component: só o `MobileNav` (com estado) vai como JavaScript.
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 bg-background">
@@ -63,11 +59,7 @@ export function SiteHeader() {
             <SearchIcon strokeWidth={1.25} className="size-5" />
             <span className="sr-only">Buscar</span>
           </Link>
-          {/*
-            Só no desktop: no celular, as opções de conta ficam no menu lateral. O
-            `<Suspense>` deixa o resto do header sair sem esperar a sessão; o fallback tem o
-            mesmo tamanho do ícone, para nada pular quando ela chega.
-          */}
+          {/* Só no desktop (no celular, fica no menu lateral). O `<Suspense>` não segura o header. */}
           <div className="hidden md:flex">
             <Suspense fallback={<AccountMenuFallback />}>
               <AccountMenu />

@@ -6,14 +6,8 @@ import { defineConfig } from "prisma/config";
 // a CLI do Prisma e o app enxergam exatamente as mesmas variáveis.
 loadEnvConfig(process.cwd());
 
-/*
-  A CLI (migrate, studio) usa um motor próprio, com parâmetros de SSL diferentes do
-  driver `pg` da aplicação. Testado no ticket 17:
-  - `sslmode=verify-full&sslrootcert=...` (padrão do PostgreSQL) é IGNORADO: conecta
-    até com a CA errada. Parece seguro e não é.
-  - `sslmode=require&sslcert=<CA>&sslaccept=strict` valida o certificado de verdade.
-  Os parâmetros são adicionados aqui para o .env continuar com a URL simples do painel.
-*/
+// A CLI tem parâmetros de SSL próprios: `sslmode=verify-full` é ignorado (conecta até com a
+// CA errada). `sslaccept=strict` com a CA valida de verdade (testado).
 function withVerifiedTls(url: string | undefined) {
   if (!url) {
     // Na Vercel o `prisma generate` roda na instalação e não precisa de banco,

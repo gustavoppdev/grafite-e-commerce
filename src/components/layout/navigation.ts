@@ -3,7 +3,7 @@ export type NavLink = {
   href: string;
 };
 
-// Categorias fixas de exemplo. Na Feature 4 (Catálogo) passam a vir do banco.
+// Categorias fixas de exemplo; passam a vir do banco com o catálogo.
 export const categoryLinks: NavLink[] = [
   { label: "Cadernos", href: "/produtos?categoria=cadernos" },
   { label: "Escrita", href: "/produtos?categoria=escrita" },

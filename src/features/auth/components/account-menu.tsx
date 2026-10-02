@@ -5,18 +5,9 @@ import { getSession } from "@/server/session";
 import { signOutAction } from "../actions";
 import { AccountDropdown } from "./account-dropdown";
 
-/*
-  Menu da conta no header: "Entrar" para Visitante, menu com o nome para quem está logado.
-
-  LER A SESSÃO AQUI TORNA AS PÁGINAS DA LOJA DINÂMICAS (renderizadas a cada requisição, não
-  no build). É de propósito, e é proteção: uma página com o nome de uma pessoa guardada no
-  cache da CDN seria servida para a próxima visitante, com o nome da anterior. A Feature 5
-  (Catálogo) reabre essa decisão, porque página de Produto é o caso perfeito de cache; as
-  alternativas estão na spec de `auth-core` ("Rotas e telas").
-
-  O header coloca este componente dentro de `<Suspense>`: o logo, as categorias e o
-  carrinho saem na hora, e só este pedaço espera o banco.
-*/
+// Ler a sessão aqui torna a loja dinâmica, e é proteção: página com nome em cache de CDN
+// seria servida a outra pessoa. O catálogo reabre a decisão (alternativas na spec de
+// `auth-core`). Fica dentro de `<Suspense>` para o resto do header não esperar o banco.
 export async function AccountMenu() {
   const user = await getSession();
 
@@ -32,19 +23,12 @@ export async function AccountMenu() {
     );
   }
 
-  /*
-    Só nome e "é Admin?" atravessam para o Client Component. Prop de Client Component vai
-    serializada no HTML da página, legível por quem abrir o código-fonte. Nada de e-mail,
-    id ou campos de ban: o menu não precisa deles.
-  */
+  // Só nome e papel vão ao Client Component: as props dele vão no HTML.
   return <AccountDropdown name={user.name} isAdmin={user.role === "admin"} />;
 }
 
-/*
-  O que aparece enquanto a sessão não chegou: o MESMO ícone, no MESMO tamanho, sem ser
-  clicável. Se o fallback tivesse outro tamanho, o header pularia quando a sessão chegasse.
-  Não mostra "Entrar" porque, para quem está logado, isso seria mentira por um instante.
-*/
+// Mesmo ícone, mesmo tamanho (o header não pula). Sem "Entrar": seria mentira para quem
+// está logado.
 export function AccountMenuFallback() {
   return (
     <span
@@ -60,11 +44,7 @@ export function AccountMenuFallback() {
   );
 }
 
-/*
-  As mesmas opções, para o menu lateral do celular. Também é Server Component: o
-  `MobileNav` (Client) recebe este bloco já renderizado, pela prop `account`, e não precisa
-  saber nada da sessão. Fica dentro de `<Suspense>` do mesmo jeito.
-*/
+// Versão do menu lateral: o `MobileNav` (Client) recebe pronta, sem conhecer a sessão.
 export async function MobileAccountLinks() {
   const user = await getSession();
   const linkClass = "block px-4 py-3 hover:bg-muted";

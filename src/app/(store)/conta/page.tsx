@@ -10,18 +10,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-/*
-  A checagem mora NA PÁGINA, e não num `layout.tsx` de `/conta`:
-  - O layout não é renderizado de novo quando se navega entre páginas que o compartilham
-    (renderização parcial). A checagem dele valeria para a primeira página e não para as
-    seguintes.
-  - O layout não impede as páginas de baixo de rodarem: elas são renderizadas pelo
-    roteador, em paralelo, e o resultado delas vai no payload mesmo que o layout "esconda".
-  (Doc do Next: `02-guides/authentication.md`, "Layouts and auth checks".)
-
-  E cada página faz a sua, mesmo com o `proxy.ts` (ticket 12) filtrando antes: o proxy é
-  conveniência e já foi contornado no passado (CVE-2025-29927). ADR 0003.
-*/
+// Checagem na página, não no layout: o layout não roda a cada navegação e não impede a
+// página de renderizar. E mesmo atrás do proxy (ADR 0003).
 export default async function AccountPage() {
   // Sem sessão: redireciona para `/entrar`. Fora de `try`, porque o redirect lança.
   const user = await requireUser();

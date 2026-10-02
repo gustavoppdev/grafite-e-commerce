@@ -12,11 +12,7 @@ import {
   signUpSchema,
 } from "./schemas";
 
-/*
-  Todo teste de recusa afirma EM QUAL CAMPO o erro caiu e com qual mensagem. Um teste que só
-  confere `success === false` passaria mesmo com a mensagem indo para o campo errado — e o
-  formulário mostraria "As senhas não são iguais." embaixo do e-mail.
-*/
+// Toda recusa confere o campo e a mensagem, não só `success === false`.
 function fieldErrors(result: z.ZodSafeParseResult<unknown>) {
   if (result.success)
     throw new Error("expected the schema to reject the input");
@@ -65,10 +61,7 @@ describe("signInSchema", () => {
     expect(fieldErrors(result).password).toEqual(["Digite sua senha."]);
   });
 
-  /*
-    O login NÃO aplica o mínimo do cadastro: quem cadastrou antes de uma regra nova continua
-    entrando. Se alguém copiar o `newPassword` para cá, este teste quebra.
-  */
+  // Quebra se alguém aplicar o mínimo do cadastro no login.
   it("accepts a password shorter than the sign-up minimum", () => {
     const result = signInSchema.safeParse({ ...valid, password: "curta" });
     expect(result.success).toBe(true);
@@ -103,10 +96,7 @@ describe("signUpSchema", () => {
     expect(signUpSchema.parse(validSignUp)).toEqual(validSignUp);
   });
 
-  /*
-    Os limites vêm das constantes, então este bloco testa a BORDA exata: um caractere antes
-    e um depois. Trocar o `min` do schema por um número próprio quebra um dos dois.
-  */
+  // Borda exata dos limites: um caractere antes e um depois.
   describe("password length", () => {
     it("asks for a password when it is empty, before the minimum message", () => {
       const result = signUpSchema.safeParse({ ...validSignUp, password: "" });
@@ -204,10 +194,7 @@ describe("signUpSchema", () => {
     expect(result.email).toBe("ana@grafite.test");
   });
 
-  /*
-    É o schema que o servidor importa. Chave fora do schema é descartada, então
-    `confirmPassword` não sai do parse mesmo que alguém a mande.
-  */
+  // O schema do servidor descarta `confirmPassword`.
   it("does not output confirmPassword", () => {
     const result = signUpSchema.parse({ ...validSignUp, confirmPassword: "x" });
     expect(result).not.toHaveProperty("confirmPassword");

@@ -4,18 +4,8 @@ import { useId } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-/*
-  Rótulo + campo + erro, ligados entre si. Os formulários de entrar e cadastrar repetiriam
-  esse trio a cada campo, e é justamente a ligação que costuma ser esquecida:
-
-  - `htmlFor`/`id`: clicar no rótulo foca o campo, e o leitor de tela sabe qual rótulo é
-    de qual campo. O `useId` gera um id estável entre servidor e cliente.
-  - `aria-invalid`: pinta a borda (regra no `input.tsx`) e avisa o leitor de tela.
-  - `aria-describedby`: amarra a mensagem ao campo, que é lida junto quando ele recebe foco.
-
-  A mensagem é texto puro do React, nunca HTML: mesmo que um dia ela viesse de fora, o
-  React a escaparia em vez de executá-la.
-*/
+// Rótulo + campo + erro ligados: `htmlFor`/`id`, `aria-invalid` e `aria-describedby` (a
+// mensagem é lida quando o campo recebe foco).
 export function AuthField({
   label,
   error,

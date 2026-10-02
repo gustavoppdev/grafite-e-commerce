@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { authErrorMessage } from "./errors";
 
-/*
-  As frases esperadas estão escritas AQUI, e não importadas do `errors.ts`. Importadas, o
-  teste compararia o módulo com ele mesmo e passaria sempre, até com a frase errada.
-*/
+// Frases escritas aqui, não importadas: senão o teste compararia o módulo com ele mesmo.
 const GENERIC = "Não foi possível concluir agora. Tente de novo em instantes.";
 
 describe("authErrorMessage", () => {
@@ -14,11 +11,7 @@ describe("authErrorMessage", () => {
     ).toBe("E-mail ou senha incorretos.");
   });
 
-  /*
-    A proteção contra enumeração é da biblioteca, mas a frase é nossa e é nossa a chance de
-    estragá-la. Este teste quebra se alguém "melhorar" a mensagem para apontar qual dos dois
-    campos está errado.
-  */
+  // Quebra se alguém "melhorar" a mensagem apontando qual campo está errado (enumeração).
   it("never says which of the two credentials was wrong", () => {
     const message = authErrorMessage({
       code: "INVALID_EMAIL_OR_PASSWORD",
@@ -64,10 +57,7 @@ describe("authErrorMessage", () => {
     expect(authErrorMessage({ code, status })).toBe(expected);
   });
 
-  /*
-    Com `autoSignIn: false` este código nem chega ao formulário. Se chegar (alguém mudou a
-    config), a pessoa NÃO pode ler "e-mail já cadastrado".
-  */
+  // Se este código chegar (config mudou), não pode virar "e-mail já cadastrado".
   it.each([
     "USER_ALREADY_EXISTS",
     "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL",

@@ -1,13 +1,7 @@
 "use client";
 
-/*
-  Último recurso: aparece quando o próprio layout raiz quebra. Como ele SUBSTITUI o
-  layout raiz, precisa montar o documento inteiro (<html>, <body>) e trazer por conta
-  própria o CSS global e a fonte. Nada do layout normal existe aqui, nem header.
-
-  Por ser Client Component, não aceita `export const metadata`; o título vai com
-  a tag <title>, que o React posiciona no <head>.
-*/
+// Substitui o layout raiz quebrado: monta `<html>`/`<body>` e traz CSS e fonte por conta
+// própria. Client Component, então o título vai num `<title>`.
 
 import { useEffect } from "react";
 import { PageMessage } from "@/components/common/page-message";
@@ -35,11 +29,7 @@ export default function GlobalError({
           description="O site encontrou um problema inesperado. Tente novamente em instantes."
         >
           <Button onClick={() => retry()}>Tentar novamente</Button>
-          {/*
-            <a> em vez de <Link> de propósito: com o layout raiz quebrado, a navegação
-            do Next (sem recarregar) pode não funcionar. Um recarregamento completo
-            reconstrói tudo do zero.
-          */}
+          {/* `<a>`: com o layout raiz quebrado, recarregar tudo é mais seguro que navegar. */}
           <a href="/" className={buttonVariants({ variant: "link" })}>
             Voltar para a página inicial
           </a>

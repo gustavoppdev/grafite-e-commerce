@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { safeRedirectPath } from "./safe-redirect";
 
-/*
-  Cada teste afirma o valor EXATO que sai. `expect(result).not.toBe(...)` passaria com a
-  função devolvendo `https://exemplo.invalido`, ou seja, não testaria nada.
-*/
+// Valor exato: `not.toBe(...)` passaria com a função devolvendo a URL de fora.
 describe("safeRedirectPath", () => {
   describe("keeps internal paths intact", () => {
     it.each([
@@ -21,10 +18,7 @@ describe("safeRedirectPath", () => {
     });
   });
 
-  /*
-    A tabela do ticket 02, uma linha por teste, com o valor no nome: quem ler a lista de
-    falhas sabe qual ataque voltou a passar.
-  */
+  // Um ataque por teste, com o valor no nome.
   describe("rejects values that leave the site", () => {
     it.each([
       "https://exemplo.invalido",

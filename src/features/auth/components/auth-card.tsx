@@ -1,18 +1,7 @@
 import { cn } from "cn";
 
-/*
-  Casca das telas de autenticação (`/entrar` e `/cadastro`): título, uma linha de apoio,
-  o formulário e um rodapé com o link para a outra tela. As duas ficam com a mesma
-  largura, o mesmo ritmo e o mesmo lugar para cada coisa.
-
-  Coluna estreita e centrada: um formulário curto esticado na largura da página fica com
-  campos de 1000px para digitar um e-mail, e o olho perde a linha.
-
-  Alinhada pelo TOPO, com respiro fixo, e não centralizada na vertical. Centralizada,
-  cada mensagem de erro que aparece aumenta a altura do bloco, o centro é recalculado e
-  tudo sobe junto, inclusive o título e os campos que não mudaram. Pelo topo, a mensagem
-  só empurra o que está abaixo dela.
-*/
+// Casca de `/entrar` e `/cadastro`: coluna estreita, alinhada pelo topo (centralizada, cada
+// mensagem de erro faria título e campos subirem).
 export function AuthCard({
   title,
   description,
@@ -26,11 +15,7 @@ export function AuthCard({
   footer?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
-  /*
-    Para quem troca o conteúdo da tela e precisa levar o foco ao título novo (a confirmação
-    do cadastro). Com ela, o título aceita foco por script (`tabIndex={-1}`), mas continua
-    fora da ordem do Tab.
-  */
+  // Permite focar o título por script (`tabIndex={-1}`) sem pô-lo na ordem do Tab.
   titleRef?: React.Ref<HTMLHeadingElement>;
 }) {
   return (

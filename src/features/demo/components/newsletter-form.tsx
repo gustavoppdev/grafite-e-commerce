@@ -7,44 +7,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { subscribeToNewsletter } from "../actions";
 
-/*
-  Consumo do `ActionResult`: o formulário é o único Client Component desta demo.
-  A página que o usa continua Server Component.
-
-  Duas formas de mostrar a falha, e elas não competem:
-  - `fieldErrors` aparece COLADO no campo, porque é lá que o usuário vai corrigir;
-  - `error` vira toast, porque é sobre o pedido inteiro e não pertence a campo nenhum.
-*/
+// Consome o `ActionResult`: `fieldErrors` colado no campo, `error` (do pedido inteiro) em toast.
 export function NewsletterForm() {
-  /*
-    `useActionState` guarda o retorno da action no estado, entrega um `action` para o
-    `<form>` e um `pending` enquanto a requisição está no ar. O estado inicial é `null`
-    (ainda não houve envio) — daí o `| null` na assinatura da action.
-
-    O `<form action={...}>` também é o que faz isso funcionar sem JavaScript: se o bundle
-    ainda não carregou, o navegador envia o formulário do jeito antigo e a action roda igual.
-  */
+  // Estado inicial `null` (ainda não houve envio). O `<form action>` funciona sem JavaScript.
   const [result, formAction, pending] = useActionState(
     subscribeToNewsletter,
     null,
   );
 
-  // `useId` gera um id único e estável entre servidor e cliente. Necessário para o
-  // `htmlFor` do Label: sem ele, clicar no rótulo não foca o campo e o leitor de tela
-  // não sabe qual rótulo pertence a qual input.
+  // Id estável entre servidor e cliente, para o `htmlFor` do Label.
   const emailId = useId();
   const errorId = useId();
 
   const fieldError =
     result?.ok === false ? result.fieldErrors?.email?.[0] : undefined;
 
-  /*
-    O toast é um efeito colateral: dispara uma vez por resposta, não a cada render.
-    Comparar a identidade do objeto resolve — cada execução da action devolve um objeto
-    novo, então `result !== shown.current` só é verdade quando chegou resposta nova.
-    (Um `useEffect` com `[result]` sozinho re-dispararia se o componente renderizasse
-    de novo por outro motivo, e o usuário veria o mesmo toast duas vezes.)
-  */
+  // Um toast por resposta: cada execução da action devolve um objeto novo, então comparar a
+  // identidade evita repetir o toast num re-render.
   const shown = useRef(result);
 
   useEffect(() => {

@@ -1,11 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseServerEnv } from "./env.schema";
 
-/*
-  Estes testes existem por um motivo específico: provar que as regras do schema dependem
-  SÓ do objeto que chega por argumento, e não do `process.env` do processo que roda o teste.
-  Nenhum teste aqui encosta no ambiente. Se um dia precisar encostar, a regra saiu do lugar.
-*/
+// Nenhum teste encosta no `process.env`: a regra depende só do objeto recebido.
 
 const valid = {
   NODE_ENV: "development",
@@ -72,10 +68,7 @@ describe("parseServerEnv", () => {
       );
     });
 
-    /*
-      O ponto do arquivo. A mesma URL passa ou falha conforme o NODE_ENV DO OBJETO,
-      sem que nada no ambiente mude entre uma chamada e outra.
-    */
+    // A mesma URL passa ou falha só pelo NODE_ENV do objeto.
     it("requires https in production for a public host", () => {
       const source = { ...valid, BETTER_AUTH_URL: "http://grafite.example" };
       expect(() =>

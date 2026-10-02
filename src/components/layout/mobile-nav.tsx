@@ -14,12 +14,8 @@ import {
 import { Logo } from "./logo";
 import type { NavLink } from "./navigation";
 
-/*
-  Este é o único pedaço do header que precisa de JavaScript no navegador:
-  abrir/fechar o menu é estado (`useState`) e reage a cliques.
-  Os links chegam por props, vindos do Server Component. Por isso eles precisam
-  ser dados serializáveis (strings, números, objetos simples), nunca funções.
-*/
+// Único pedaço do header com JavaScript (abrir/fechar). Os links chegam por props do
+// servidor: só dados serializáveis.
 export function MobileNav({
   links,
   account,
@@ -50,10 +46,7 @@ export function MobileNav({
           </SheetTitle>
         </SheetHeader>
 
-        {/*
-          Fecha o menu quando QUALQUER link dentro dele é clicado, inclusive os da conta, que
-          chegam prontos do servidor e não têm como receber um `onClick` daqui.
-        */}
+        {/* Fecha em qualquer link, inclusive os da conta, que chegam do servidor sem `onClick`. */}
         {/* biome-ignore lint/a11y/noStaticElementInteractions: só observa cliques que acontecem nos links de dentro; não é um controle. */}
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: Enter num link também dispara `click`. */}
         <div

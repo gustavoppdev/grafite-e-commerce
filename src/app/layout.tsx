@@ -23,11 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={`${fontSans.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         {children}
-        {/*
-          Um único <Toaster /> para o app inteiro, no layout raiz: ele é o lugar onde os
-          toasts são renderizados, e `toast()` de qualquer componente fala com este aqui.
-          Dois Toasters na árvore mostrariam a mesma mensagem duas vezes.
-        */}
+        {/* Um só `<Toaster />`: dois mostrariam cada toast duas vezes. */}
         <Toaster />
       </body>
     </html>

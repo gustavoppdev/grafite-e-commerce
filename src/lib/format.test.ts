@@ -1,17 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { formatPrice } from "./format";
 
-/*
-  Espaço NÃO SEPARÁVEL (U+00A0): é o caractere que o Intl coloca entre "R$" e o número,
-  para a quebra de linha nunca separar os dois. Na tela parece um espaço comum, mas
-  "R$ 1.234,56" digitado com espaço normal NÃO é igual e o teste falharia.
-
-  Escrito como escape (`\u{a0}`) de propósito: colado como caractere literal ele some no
-  meio do código e ninguém entende por que o teste quebrou. Note que a solução é deixar o
-  valor ESPERADO legível, e não afrouxar a comparação — normalizar a string antes do
-  `toBe`, ou usar `toContain`/regex com `\s`, faria o teste aceitar o espaço comum, que é
-  exatamente o erro que ele existe para pegar.
-*/
+// O Intl usa espaço não separável (U+00A0) entre "R$" e o número. Escrito como escape para
+// ficar visível; normalizar a comparação aceitaria o espaço comum, que é o erro a pegar.
 const nbsp = "\u{a0}";
 
 // Trecho distintivo da mensagem de erro. `toThrow` com string confere se a mensagem
@@ -32,12 +23,7 @@ describe("formatPrice", () => {
     expect(result).toBe(`R$${nbsp}1.234,56`);
   });
 
-  /*
-    Cada caso abaixo trava um risco DIFERENTE, não uma variação do mesmo teste:
-    o zero à esquerda em valores abaixo de um real, o segundo separador de milhar nos
-    milhões, e os centavos zerados — que precisam continuar aparecendo, senão a vitrine
-    mostraria "R$ 100" ao lado de "R$ 99,90" e a coluna de preços ficaria torta.
-  */
+  // Um risco por caso: zero à esquerda, separador de milhar nos milhões, centavos zerados.
   it("formats zero", () => {
     const result = formatPrice(0);
 
@@ -62,14 +48,8 @@ describe("formatPrice", () => {
     expect(result).toBe(`R$${nbsp}10,00`);
   });
 
-  /*
-    Entradas inválidas. O `expect` recebe uma FUNÇÃO, não o resultado da chamada: quem
-    precisa executar `formatPrice` é o próprio `toThrow`, para capturar o erro. Passando
-    `formatPrice(-1000)` direto, a chamada estouraria antes de o `expect` existir.
-
-    O trecho passado para `toThrow` importa: `toThrow()` sem argumento passa com QUALQUER
-    erro, inclusive um TypeError vindo de um engano no próprio teste.
-  */
+  // `expect` recebe uma função, para o `toThrow` capturar. O trecho da mensagem evita passar
+  // com qualquer erro, inclusive um engano do próprio teste.
   it("throws for a negative amount", () => {
     expect(() => formatPrice(-1000)).toThrow(invalidAmount);
   });

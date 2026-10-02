@@ -1,10 +1,8 @@
-// Prisma 7: as URLs de conexão não ficam mais aqui, e sim em prisma.config.ts (CLI)
-// e em src/server/db.ts (aplicação, via adaptador).
+// Prisma 7: as URLs ficam em prisma.config.ts (CLI) e src/server/db.ts (aplicação).
 
 generator client {
   provider = "prisma-client"
-  // Gerado dentro de src/ para ser importado como `@/generated/prisma/client`.
-  // É código gerado: fica fora do git e é recriado por `pnpm db:generate` / postinstall.
+  // Código gerado, fora do git: `pnpm db:generate`.
   output   = "../src/generated/prisma"
 }
 
@@ -14,24 +12,13 @@ datasource db {
 
 // ─── Auth (better-auth) ──────────────────────────────────────────────────────────
 //
-// Gerado pela CLI do better-auth (`auth generate`) e revisado à mão; como gerar de novo
-// está no ticket 04 de `auth-core`. Se mudar plugin ou opção que mexe em tabela no
-// `src/server/auth.ts`, gere de novo: na inicialização o better-auth compara este schema
-// com o que ele espera e responde 500 em toda rota de auth se divergir.
+// Gerado pela CLI do better-auth e revisado. Mudou plugin ou opção que cria tabela no
+// `auth.ts`? Gere de novo. Depois de toda migration, `pnpm db:generate` (o Prisma 7 não gera
+// sozinho, e o better-auth responde 500 `SCHEMA_MISMATCH` com client velho).
 //
-// Depois de toda migration: `pnpm db:generate`. No Prisma 7 o `migrate dev` NÃO gera mais
-// o client, e o better-auth confere o client gerado, não o banco: tabela criada e client
-// velho também dá 500 (`SCHEMA_MISMATCH`, visto no ticket 13).
-//
-// Três escolhas que valem notar:
-// - `id String @id` SEM `@default`: o better-auth gera um ID aleatório na aplicação.
-//   Nunca `autoincrement()`: ID sequencial deixa adivinhar o registro seguinte (IDOR) e
-//   revela quantas contas a loja tem.
-// - `role` pode ser nulo: quem grava "user" é o plugin admin, no cadastro. Um usuário
-//   criado por fora dele fica com `null`, e `requireAdmin` compara com "admin", então
-//   nulo cai no lado seguro (sem acesso).
-// - `onDelete: Cascade`: apagar um usuário apaga as sessões e contas dele. Sem isso, a
-//   sessão sobreviveria ao dono.
+// - `id` sem `@default`: ID aleatório gerado na aplicação, nunca sequencial (IDOR).
+// - `role` nulo cai no lado seguro: não é "admin".
+// - `onDelete: Cascade`: a sessão não sobrevive ao dono.
 
 model User {
   id            String    @id
@@ -81,8 +68,7 @@ model Account {
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
   scope                 String?
-  // Hash scrypt da senha (nunca a senha). Mora em `account`, não em `user`, então uma
-  // query de usuário não carrega o hash por acidente.
+  // Hash scrypt, em `account`: query de usuário não carrega o hash por acidente.
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
@@ -105,16 +91,9 @@ model Verification {
 
 // ─── Rate limit (better-auth) ────────────────────────────────────────────────────
 //
-// Contador de tentativas das rotas `/api/auth/*`. Só existe porque o `src/server/auth.ts`
-// usa `rateLimit.storage: "database"`; também gerado pela CLI (ticket 13 de `auth-core`).
-//
-// - `key` é `${ip}|${caminho}`, ex. "203.0.113.7|/sign-in/email". Único: é por ele que o
-//   better-auth acha a linha, e a unicidade é o que impede duas requisições simultâneas
-//   de criarem dois contadores para a mesma chave (a segunda falha e relê a primeira).
-// - `lastRequest` é o instante da última tentativa ACEITA, em milissegundos (Date.now()).
-//   Não cabe num Int de 32 bits, por isso BigInt.
-// - Guarda IP, que é dado pessoal. As linhas se apagam sozinhas: o better-auth remove as
-//   mais velhas que a maior janela configurada sempre que um contador recomeça.
+// Existe por `rateLimit.storage: "database"`. `key` = `${ip}|${caminho}`, única (evita dois
+// contadores sob concorrência). `lastRequest` em ms, por isso BigInt. Guarda IP; as linhas
+// velhas são apagadas pela biblioteca.
 model RateLimit {
   id          String @id
   key         String

@@ -1,10 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { withMinimumDuration } from "./minimum-duration";
 
-/*
-  Relógio falso: o teste controla o tempo em vez de esperar de verdade. `settled` registra
-  quando a promessa terminou, para afirmar que ela NÃO terminou antes do piso.
-*/
+// Relógio falso; `settled` prova que a promessa não terminou antes do piso.
 describe("withMinimumDuration", () => {
   beforeEach(() => {
     vi.useFakeTimers();

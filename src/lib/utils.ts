@@ -1,9 +1,2 @@
-/*
-  Este arquivo existe só para o CLI do shadcn.
-
-  O `components.json` aponta `aliases.utils` para cá, e todo componente que o
-  `shadcn add` gera importa `cn` de `@/lib/utils`. Nosso código importa direto do
-  pacote `cn`, então nada no projeto usa este caminho hoje — mas apagá-lo quebraria
-  o próximo componente gerado.
-*/
+// Só para o CLI do shadcn, que gera componentes importando `cn` daqui.
 export { cn } from "cn";

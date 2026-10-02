@@ -1,16 +1,5 @@
-/*
-  Roda `work` e só devolve depois de pelo menos `minimumMs` milissegundos, tenha `work`
-  dado certo ou lançado erro.
-
-  Serve para esconder do cronômetro o caminho que o servidor tomou. Exemplo do login: quando
-  o e-mail não existe, o servidor faz uma consulta a menos no banco e responde mais rápido.
-  Com a resposta sempre saindo no mesmo piso, os dois caminhos ficam iguais também no tempo,
-  não só no conteúdo.
-
-  O piso tem que ser MAIOR que o caminho mais lento em condições normais: se `work`
-  ultrapassar o piso, aquela resposta sai com o tempo real, e a diferença volta a aparecer
-  nesses casos.
-*/
+// Devolve só depois de `minimumMs`, com sucesso ou erro: esconde do cronômetro o caminho
+// que o servidor tomou. Só funciona se o piso ficar acima do caminho mais lento normal.
 export async function withMinimumDuration<T>(
   work: () => Promise<T>,
   minimumMs: number,

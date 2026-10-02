@@ -5,27 +5,15 @@ import { useEffect, useRef, useState } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { AuthField } from "./auth-field";
 
-/*
-  Campo de senha com o botão de mostrar/ocultar. Ver a senha reduz erro de digitação,
-  principalmente no celular, e é o que deixa alguém usar uma senha longa sem medo de errar.
-
-  O mecanismo é só trocar `type="password"` por `type="text"`. Os cuidados são em volta:
-*/
+// Senha com botão de mostrar: ver a senha reduz erro de digitação e incentiva senha longa.
 export function PasswordField(
   props: Omit<React.ComponentProps<typeof AuthField>, "type" | "action">,
 ) {
   const [visible, setVisible] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  /*
-    Volta a esconder quando o formulário é enviado. Gerenciadores de senha reconhecem o
-    campo pelo `type="password"`: se ele estiver como texto no envio, o navegador pode não
-    oferecer para salvar a senha, ou guardá-la como texto comum no histórico de
-    preenchimento. E a senha não fica exposta na tela depois do envio.
-
-    O listener é no `<form>` (que o botão conhece por `.form`), para funcionar em qualquer
-    formulário sem cada um lembrar de chamar nada.
-  */
+  // Volta a esconder no envio: o gerenciador reconhece o campo pelo `type="password"`, e a
+  // senha não fica exposta depois.
   useEffect(() => {
     const form = buttonRef.current?.form;
     if (!form) return;
@@ -38,28 +26,18 @@ export function PasswordField(
     <AuthField
       {...props}
       type={visible ? "text" : "password"}
-      /*
-        Com `type="text"`, o navegador passaria a tratar a senha como texto comum: o
-        corretor do celular sugeriria "consertar" a senha, o teclado poria a primeira
-        letra em maiúscula, e o corretor ortográfico avançado do Chrome e do Edge pode
-        ENVIAR o texto do campo para os servidores deles para checar a grafia. Os três
-        ficam desligados, mostrando ou não.
-      */
+      // Como texto, o corretor "consertaria" a senha e o do Chrome/Edge pode enviá-la aos
+      // servidores deles: desligados sempre.
       autoCapitalize="none"
       autoCorrect="off"
       spellCheck={false}
       action={
         <button
           ref={buttonRef}
-          // `type="button"`: dentro de um `<form>`, o padrão é `submit`, e clicar no olho
-          // enviaria o formulário.
+          // `type="button"`: o padrão dentro de `<form>` é submit.
           type="button"
           onClick={() => setVisible((current) => !current)}
-          /*
-            Rótulo fixo + `aria-pressed`: o leitor de tela anuncia "Mostrar senha, botão de
-            alternância, pressionado/não pressionado". Trocar o rótulo E ter `aria-pressed`
-            ao mesmo tempo diria a mesma coisa de dois jeitos contraditórios.
-          */
+          // Rótulo fixo + `aria-pressed` (trocar os dois se contradiria no leitor de tela).
           aria-label="Mostrar senha"
           aria-pressed={visible}
           className={buttonVariants({

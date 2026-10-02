@@ -8,10 +8,6 @@ export const metadata: Metadata = {
   title: "Criar conta",
 };
 
-/*
-  Mesma estrutura do `/entrar`: o servidor decide o destino e se a pessoa já está logada,
-  e só o formulário vai para o navegador.
-*/
 export default async function SignUpPage({
   searchParams,
 }: PageProps<"/cadastro">) {
@@ -21,10 +17,7 @@ export default async function SignUpPage({
 
   if (await getSession()) redirect(redirectTo);
 
-  /*
-    O cadastro não entra sozinho (`autoSignIn: false`): o caminho é cadastro → login. O
-    destino original segue junto até o login, que é quem de fato redireciona para ele.
-  */
+  // Cadastro não faz login: o destino segue até o `/entrar`, que redireciona.
   const signInHref =
     redirectTo === safeRedirectPath(undefined)
       ? "/entrar"
