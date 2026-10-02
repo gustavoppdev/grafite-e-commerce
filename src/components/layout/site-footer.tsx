@@ -50,7 +50,8 @@ export function SiteFooter() {
           © {year} {siteConfig.name}
         </p>
         <p>
-          Loja fictícia para fins de estudo. Nenhum pagamento real é processado.
+          Loja fictícia, projeto de portfólio. Nada é vendido e nenhum pagamento
+          real é processado.
         </p>
       </Container>
     </footer>

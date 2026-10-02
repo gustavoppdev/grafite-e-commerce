@@ -131,6 +131,17 @@ export function SignUpForm({ signInHref }: { signInHref: string }) {
         <Button type="submit" disabled={pending} className="mt-1 w-full">
           {pending ? "Criando conta..." : "Criar conta"}
         </Button>
+
+        {/*
+          A loja é de demonstração (portfólio) e qualquer visitante pode criar conta. O
+          risco real para quem testa é REAPROVEITAR a senha de outro serviço: se este banco
+          vazasse, o hash protege, mas o hábito é o que o credential stuffing explora. O
+          aviso fica junto do botão, que é o momento da decisão.
+        */}
+        <p className="text-center text-meta text-muted-foreground">
+          Loja de demonstração. Use uma senha que você não usa em nenhum outro
+          lugar.
+        </p>
       </form>
     </AuthCard>
   );
