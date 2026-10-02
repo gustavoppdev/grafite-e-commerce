@@ -1,48 +1,55 @@
 # 16 - Doc de estudo da feature
 
-Status: open
-Responsável: ~~Gustavo~~ Claude
+Status: resolved
+Responsável: Claude
 Blocked by: 15
 
 ## O que
 
-`docs/features/01-auth-core.md`, em pt-BR: o documento que você usa para defender esta
-feature numa entrevista.
+O material de estudo do módulo, em `~/Documentos/grafite-estudo/01-auth-essencial/`, no
+formato do da Fundação (AGENTS.md, decisão de 2026-10-01, que substituiu o
+`docs/features/01-auth-core.md` que este ticket previa). O resumo para entrevista é o
+capítulo 12.
 
 ## Critérios de aceite
 
-- [ ] Registra o que foi **considerado e descartado**, com o custo de cada alternativa —
-      não narra o que o código faz.
-- [ ] Cada decisão de segurança aparece pelo **ataque** que ela previne.
-- [ ] Os números que você escolheu (limites do rate limit, tamanho da secret, tamanho da
-      senha) estão lá com a conta que os justifica.
-- [ ] O que ficou como dívida consciente está nomeado, com o ticket/feature que resolve.
-
-## Guia
-
-- **A matéria-prima são os `## Comments` dos tickets desta pasta**, não o código. Se um
-  ticket ficou sem registro de decisão, é um sinal: ou a decisão foi automática (então não
-  vale escrever), ou você a esqueceu (então recupere agora, enquanto está fresca).
-
-- **As decisões desta feature que rendem mais numa conversa técnica:**
-  - Login pelo cliente da biblioteca e não por server action, **porque o rate limit mora no
-    roteador HTTP**. É uma decisão que contraria o padrão do próprio projeto por um motivo
-    concreto — exatamente o tipo de coisa que diferencia quem copiou tutorial de quem
-    entendeu. As três alternativas e o custo de cada uma estão na spec.
-  - `cookieCache` desligado: uma consulta por requisição em troca de revogação imediata.
-  - `requireAdmin` devolvendo 404 em vez de 403.
-  - Autorização repetida em toda página/action, com o proxy só como conveniência
-    (ADR 0003, CVE-2025-29927).
-  - Mensagem única no login (o que o usuário perde, e o que a Feature 2 devolve).
-  - Rate limit no banco e não em memória por causa de serverless.
-  - Primeiro Admin fora da interface, e `role` nunca vindo de formulário.
-  - Sem regra de composição de senha, e o que entra no lugar.
-  - Ler a sessão no header tornar as páginas dinâmicas — e isso ser proteção.
-
-- **Escreva o que você erraria de novo.** O `server-only` versus a CLI (tickets 04 e 14) é
-  uma cicatriz útil: ela mostra que você entende *por que* a regra do `src/server/` existe e
-  onde ela deixa de valer.
-
-- Pode ser curto. Denso e defensável vale mais que longo.
+- [x] Registra o que foi **considerado e descartado**, com o custo de cada alternativa —
+      não narra o que o código faz. (Cap. 12, seção 1, e em cada capítulo.)
+- [x] Cada decisão de segurança aparece pelo **ataque** que ela previne. (README do módulo:
+      tabela ataque → onde está fechado → capítulo.)
+- [x] Os números escolhidos estão lá com a conta que os justifica. (Cap. 12, seção 2.)
+- [x] O que ficou como dívida consciente está nomeado, com o módulo que resolve. (Cap. 12,
+      seção 3.)
 
 ## Comments
+
+### 2026-10-02 — Claude
+
+**Pasta reorganizada por módulo** (pedido do Gustavo):
+
+```
+~/Documentos/grafite-estudo/
+├── README.md            índice geral, como usar, tags de estudo, aviso
+├── 00-fundacao/         os 10 capítulos da Fundação (movidos) + README do módulo
+└── 01-auth-essencial/   README (ataques, índice, roteiro de reconstrução) + 12 capítulos
+```
+
+O README da Fundação virou índice do módulo; "Como usar" e o aviso foram para o README geral.
+O capítulo 10 da Fundação ganhou uma nota sobre o `postinstall` pulado pelo cache (achado do
+ticket 15).
+
+**Capítulos do módulo 01:** 01 sessão e cookie · 02 tabelas e banco exposto · 03 do
+formulário ao servidor · 04 enumeração · 05 telas · 06 open redirect · 07 autorização ·
+08 proxy · 09 rate limit · 10 primeiro Admin · 11 deploy · 12 decisões para defender.
+
+Cada capítulo segue o formato da Fundação (conceito → GRAFITE → armadilhas → para outros
+projetos → teste seu entendimento). A matéria-prima foram os Comments dos tickets 01–15, a
+spec e os ADRs 0003 e 0005; os trechos de código foram conferidos contra os arquivos atuais.
+
+**Roteiro de reconstrução** no README do módulo: os 15 passos na ordem dos tickets, cada um
+com o "confira" que prova que funcionou (pedido do AGENTS.md: o doc tem que servir de guia
+para refazer o módulo isolado).
+
+**Os docs citam as tags `estudo/foundation` e `estudo/auth-core`.** A segunda é do ticket
+17; a primeira também entra lá (no commit `266c622`, fim da Fundação), para o módulo 00
+apontar para a versão do código que ele descreve.

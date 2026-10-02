@@ -29,8 +29,10 @@ abandoned past projects mid-way, so momentum beats exercises. Since 2026-10-01:
 - Code keeps explanatory comments in pt-BR that explain *why*, not *what* (trimmed at the
   end of the feature, see below).
 - **At the end of each feature**, write the feature study doc in the format of the
-  Foundation one (`~/Documentos/grafite-estudo/`: a README + one chapter per topic; each
-  chapter = concept from scratch → how GRAFITE does it → pitfalls). Gustavo will later
+  Foundation one, in its own module folder (`~/Documentos/grafite-estudo/NN-<modulo>/`: a
+  README with the attack table, chapter index and a rebuild roadmap + one chapter per topic;
+  each chapter = concept from scratch → how GRAFITE does it → pitfalls; list the module in
+  the root README). Gustavo will later
   rebuild each feature as an isolated study project (one per module: foundation, auth, ...),
   so the doc must stand on its own as a guide for that.
 - **Then close the feature with a comment diet** (its own last ticket; decided 2026-10-02):
