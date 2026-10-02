@@ -26,10 +26,7 @@ nenhum fora tem.
 
 ## Notas para features futuras
 
-- **Feature 1 (Auth):** as respostas servidas do cache estático da Vercel trazem
-  `access-control-allow-origin: *` (adicionado pelo CDN deles, não por nós). Endereçado na
-  Feature 1: ler a sessão no header torna as páginas da loja dinâmicas, então resposta
-  autenticada não passa mais pelo cache estático. **Conferir no ticket 15** e fechar a nota.
+- ~~**Feature 1 (Auth):** respostas do cache estático da Vercel vinham com `access-control-allow-origin: *`.~~ **Fechada no ticket 15 de `auth-core`:** as páginas são dinâmicas (`private, no-store`, `x-vercel-cache: MISS`) e o header não aparece mais.
 
 - **Feature 5 (Catálogo):** a sessão é lida no header da loja (Feature 1), o que torna
   **toda página da loja dinâmica** — e a página de Produto é justamente o caso perfeito de

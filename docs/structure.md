@@ -37,6 +37,7 @@ src/
 └── generated/                    Prisma Client (gerado, fora do git)
 prisma/                           schema.prisma + migrations/
 scripts/                          tarefas de operador, rodadas no terminal (`pnpm admin:promote`)
+vercel.json                       região das funções (gru1, ao lado do banco em São Paulo)
 certs/                            CA do Supabase (pública, usada no TLS)
 docs/                             ADRs, este arquivo, instruções dos agentes
 .scratch/                         roadmap, specs e tickets de cada feature
