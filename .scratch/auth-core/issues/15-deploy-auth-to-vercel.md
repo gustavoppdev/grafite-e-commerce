@@ -24,6 +24,13 @@ seguro, cache e origem confiável.
 - [ ] `/admin` como Cliente responde 404 em produção.
 - [ ] Rate limit funciona em produção (429 depois do limite) e o contador está na tabela —
       é aqui que "memória" versus "banco" aparece de verdade, com várias instâncias.
+- [ ] **IP do rate limit não é falsificável em produção** (achado do ticket 13): mandar um
+      login com `-H 'X-Forwarded-For: 203.0.113.7'` e conferir na tabela `rateLimit` que a
+      chave é o IP **real**, não o inventado. Conferir também que nenhuma chave é
+      `no-trusted-ip|...` (seria a loja inteira dividindo 3 logins a cada 10s). Em
+      desenvolvimento o `next dev` repassa o header do cliente sem mexer; quem tem que
+      sobrescrever é a Vercel. Se não sobrescrever: configurar
+      `advanced.ipAddress.ipAddressHeaders` com o header que a Vercel controla.
 - [ ] Os headers de segurança da Fundação continuam em todas as respostas.
 - [ ] A secret de produção nunca foi commitada nem apareceu em log de build.
 

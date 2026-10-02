@@ -137,6 +137,70 @@ export const auth = betterAuth({
   */
 
   /*
+    Rate limit: contra FORÇA BRUTA (milhares de senhas numa conta) e CREDENTIAL STUFFING
+    (a lista de e-mail+senha vazada de outro site, testada aqui porque muita gente repete
+    senha). É também o que dá sentido às mensagens genéricas do ticket 07: sem limite,
+    daria para testar 10 mil e-mails por minuto mesmo sem resposta reveladora.
+
+    Vale só para o que passa pelo roteador HTTP (`/api/auth/*`). `auth.api.*` chamado do
+    servidor NÃO é limitado; por isso entrar e cadastrar vão pelo `authClient` (ADR 0005).
+  */
+  rateLimit: {
+    // O padrão é `isProduction`: sem isto, o limite nunca rodaria em desenvolvimento e a
+    // primeira vez que ele funcionasse (ou falhasse) seria em produção.
+    enabled: true,
+
+    /*
+      No banco (tabela `rateLimit`), não na memória. Na Vercel cada requisição pode cair numa
+      instância diferente, e instância nova nasce com o contador zerado: em memória, "3 por
+      10s" vira "3 por 10s POR INSTÂNCIA", ilimitado para quem souber disso.
+
+      O contador no banco é atômico (conferido em `api/rate-limiter`, v1.7.6): o incremento
+      é um UPDATE condicional ("só se count < max"), então 50 tentativas simultâneas não
+      passam todas por terem lido o mesmo número antes de alguém gravar.
+
+      Não configurar `customStorage` junto: se existir, ele ganha deste em silêncio.
+    */
+    storage: "database",
+
+    /*
+      Limite GLOBAL, para toda rota de `/api/auth` sem regra própria. São os padrões do
+      código (a doc diz 60s; o código da 1.7.6 diz 10s), escritos para não mudarem por baixo
+      numa atualização.
+
+      As rotas sensíveis já têm regra embutida mais rígida, que mantivemos (a conta está no
+      ticket 13): `/sign-in*`, `/sign-up*`, `/change-password*` e `/change-email*` são
+      3 por 10s. Por isso não há `customRules`.
+
+      Como a biblioteca conta: a janela começa na última tentativa ACEITA, não num relógio
+      fixo. Três tentativas seguidas e a quarta é recusada até passarem 10s da terceira. Não
+      existe o "efeito de borda" de janela fixa (3 no segundo 9 + 3 no segundo 11), e a
+      tentativa recusada não estica o bloqueio.
+
+      O que isto NÃO resolve: a chave é `${ip}|${caminho}`. Com 100 IPs, 100× mais senhas
+      na mesma conta; e IP é compartilhado (operadora, NAT) e trocável (proxy, botnet).
+      Rate limit por IP é atrito, não barreira. O resto vem na Feature 2 (Turnstile, senha
+      vazada, e a decisão de contar também por e-mail).
+    */
+    window: 10,
+    max: 100,
+
+    /*
+      De onde sai o IP: do `x-forwarded-for` (padrão, sem `advanced.ipAddress`), e só se o
+      header tiver UM valor. Quem manda a requisição escreve o que quiser nele; com vários
+      valores, o primeiro é justamente o que o cliente pode ter inventado, e a biblioteca se
+      recusa a escolher (conferido em `@better-auth/core/utils/ip`).
+
+      O risco do outro lado: sem IP confiável, em produção, TODO MUNDO cai numa chave só
+      ("no-trusted-ip|/sign-in/email") e a loja inteira divide 3 logins a cada 10s. Segundo
+      a doc da Vercel, lá o header chega com um valor só, escrito por ela por cima do que o
+      cliente mandou. O ticket 15 confere isso nas chaves da tabela em produção.
+
+      Em desenvolvimento, sem o header, a biblioteca usa 127.0.0.1.
+    */
+  },
+
+  /*
     Camada 3 da validação (tabela na spec): as NOSSAS regras que o better-auth não impõe.
 
     Roda dentro do roteador HTTP, depois do rate limit e antes do endpoint, e também nas

@@ -19,6 +19,10 @@ datasource db {
 // `src/server/auth.ts`, gere de novo: na inicialização o better-auth compara este schema
 // com o que ele espera e responde 500 em toda rota de auth se divergir.
 //
+// Depois de toda migration: `pnpm db:generate`. No Prisma 7 o `migrate dev` NÃO gera mais
+// o client, e o better-auth confere o client gerado, não o banco: tabela criada e client
+// velho também dá 500 (`SCHEMA_MISMATCH`, visto no ticket 13).
+//
 // Três escolhas que valem notar:
 // - `id String @id` SEM `@default`: o better-auth gera um ID aleatório na aplicação.
 //   Nunca `autoincrement()`: ID sequencial deixa adivinhar o registro seguinte (IDOR) e
@@ -97,4 +101,26 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// ─── Rate limit (better-auth) ────────────────────────────────────────────────────
+//
+// Contador de tentativas das rotas `/api/auth/*`. Só existe porque o `src/server/auth.ts`
+// usa `rateLimit.storage: "database"`; também gerado pela CLI (ticket 13 de `auth-core`).
+//
+// - `key` é `${ip}|${caminho}`, ex. "203.0.113.7|/sign-in/email". Único: é por ele que o
+//   better-auth acha a linha, e a unicidade é o que impede duas requisições simultâneas
+//   de criarem dois contadores para a mesma chave (a segunda falha e relê a primeira).
+// - `lastRequest` é o instante da última tentativa ACEITA, em milissegundos (Date.now()).
+//   Não cabe num Int de 32 bits, por isso BigInt.
+// - Guarda IP, que é dado pessoal. As linhas se apagam sozinhas: o better-auth remove as
+//   mais velhas que a maior janela configurada sempre que um contador recomeça.
+model RateLimit {
+  id          String @id
+  key         String
+  count       Int
+  lastRequest BigInt
+
+  @@unique([key])
+  @@map("rateLimit")
 }

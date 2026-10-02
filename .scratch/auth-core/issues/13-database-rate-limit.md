@@ -1,7 +1,7 @@
 # 13 - Rate limit no banco, mais rígido nas rotas sensíveis
 
-Status: open
-Responsável: ~~Gustavo~~ Claude
+Status: resolved
+Responsável: Claude
 Blocked by: 04
 
 ## O que
@@ -15,6 +15,11 @@ limites que já existem são os que a gente quer.
   `storage: "database"`, e `customRules` **só se** você concluir que os padrões não servem.
 - Verificar na mão que o 429 acontece e que o contador está mesmo na tabela.
 
+O ataque: **força bruta** (milhares de senhas numa conta) e **credential stuffing** (a lista
+de e-mail+senha vazada de outro site, testada aqui porque muita gente repete senha). É
+também o que dá sentido às mensagens genéricas do ticket 07: sem limite, daria para testar
+10 mil e-mails por minuto.
+
 **Leia antes de começar, porque muda o ticket:** apurado no código da v1.7.5, o better-auth
 **já** aplica regras especiais embutidas de **3 requisições por 10s** em `/sign-in*`,
 `/sign-up*`, `/change-password*` e `/change-email*`. O padrão global é 10s/100 (a doc diz
@@ -24,91 +29,106 @@ a fazer.
 
 ## Critérios de aceite
 
-- [ ] A tabela existe, a migration foi lida antes de aplicar, e as linhas aparecem lá
-      quando você bate no endpoint (conferir no Supabase ou no `db:studio`).
-- [ ] Repetir `POST /api/auth/sign-in/email` devolve **429**, e o número de tentativas
+- [x] A tabela existe, a migration foi lida antes de aplicar, e as linhas aparecem lá
+      quando você bate no endpoint.
+- [x] Repetir `POST /api/auth/sign-in/email` devolve **429**, e o número de tentativas
       permitidas é o que você espera (contar, não estimar). O header é `X-Retry-After`.
-- [ ] Depois da janela, volta a aceitar.
-- [ ] O limite global (mais folgado) continua valendo nas outras rotas de `/api/auth`.
-- [ ] Está registrado se você manteve 3/10s ou trocou, **com a conta que justifica**.
-- [ ] Navegar normalmente na loja **não** dispara 429.
-- [ ] `pnpm lint`, `pnpm typecheck` e `pnpm build` passam.
-
-## Guia
-
-### O ataque que isso previne
-
-**Força bruta e credential stuffing.** Sem limite, o formulário de login aceita quantas
-tentativas o atacante quiser: ou ele testa milhares de senhas numa conta, ou — o caso mais
-comum hoje — pega uma lista de e-mail+senha vazada de outro site e testa todas na nossa
-loja, porque muita gente repete senha. Também é o que freia a enumeração de contas do
-ticket 07: mensagem genérica não serve para nada se dá para testar 10 mil e-mails por minuto.
-
-### Como abordar
-
-- **Onde se inspirar:** o ticket 04 é o exemplo da migration (leia os comentários que
-  ficaram nele). O `src/server/auth.ts` (ticket 03) é onde a config entra, e os comentários
-  de lá mostram o tom.
-
-- **Descubra o schema da tabela na doc, não por tentativa.** O better-auth diz quais campos
-  a tabela de rate limit precisa (`storage: "database"` na seção de rate limit da doc da
-  **versão instalada**) e aceita `modelName` se você quiser outro nome. Se os nomes das
-  colunas não baterem exatamente, o erro vai aparecer em runtime, na primeira requisição.
-  Confira também se a CLI (`auth generate`) gera esse model — e lembre do risco do
-  `server-only` registrado no ticket 04.
-
-- **Padrão perigoso: `enabled` é `isProduction` por default.** Se você não ligar
-  explicitamente, o rate limit **não roda em desenvolvimento** — você testa, passa, e a
-  primeira vez que o código roda de verdade é em produção. Ligue e teste localmente.
-
-- **Por que no banco e não em memória (o padrão):** está na spec, mas vale você reproduzir o
-  raciocínio antes de ler: na Vercel, duas requisições suas podem cair em duas instâncias
-  diferentes, e uma instância nova nasce com o contador zerado. O que "5 tentativas por
-  minuto" significa nesse mundo, se o contador está na memória de cada instância?
-
-- **Escolher os números é a parte difícil, e agora a pergunta é se você concorda com os
-  deles.** 3 por 10s dá 18 por minuto, 1080 por hora, por IP e por rota. Pense nos dois
-  cenários e veja se o número serve:
-  1. Uma pessoa que esqueceu a senha erra 3, 4, 5 vezes seguidas — rápido, porque está
-     tentando variações da mesma senha. Com 3/10s, na quarta tentativa ela toma 429. Isso é
-     aceitável ou você acabou de criar um jeito de irritar cliente legítimo? Uma janela
-     maior com teto maior (ex. 10 por 60s) atende os dois lados melhor, ou pior?
-  2. Um atacante com uma lista de 10 mil senhas: 1080/hora dá pouco mais de 9 horas por IP.
-     Muda de "minutos" para "horas" — o suficiente? E se ele tiver 100 IPs?
-
-  O cenário 2 expõe o limite estrutural: a chave é `${ip}|${path}` e **não dá para contar
-  por e-mail** com `customRules` (elas só trocam janela e máximo). Registre isso como o que
-  o rate limit **não** resolve; quem resolve é a Feature 2 (Turnstile e senha vazada).
-
-- **Janela fixa, e o efeito de borda:** confirme como o better-auth conta. Numa janela fixa
-  de 10s, quem tenta no segundo 9 e no segundo 11 faz o dobro do limite em dois segundos.
-  Aceitável aqui? Saiba **que** é assim e por que aceita.
-
-- **Janela deslizante ou fixa?** Confira qual o better-auth implementa. Numa janela fixa de
-  60s, quem tenta no segundo 59 e no segundo 61 faz o dobro do limite em dois segundos. Isso
-  é aceitável aqui? (Provavelmente sim — mas saiba **que** é assim, e por que aceita.)
-
-- **Testando:** um `for` com `curl` no `/api/auth/sign-in/email` resolve. Use e-mail e senha
-  inválidos de propósito. Repare em duas coisas: o status muda de 401 para 429, e o corpo /
-  header dizem quando tentar de novo. Confirme também que o contador está mesmo indo para a
-  **tabela** — se você configurar errado, o better-auth cai para memória e o teste passa do
-  mesmo jeito localmente, e só quebra na Vercel. (Como você comprova, sem confiar no config?)
-
-- **Pitfall 1:** o limite é por IP, e em desenvolvimento seu IP é sempre o mesmo — fácil de
-  se bloquear sozinho durante os tickets 08 e 09. Saiba como limpar (apagar as linhas da
-  tabela) antes de precisar.
-
-- **Pitfall 2:** o rate limit vale para o que passa pelo roteador HTTP do better-auth. É
-  exatamente por isso que cadastro e login vão pelo `authClient` nesta feature e não por
-  server action (ver "Por onde o formulário fala com o better-auth" na spec). Ao configurar,
-  confirme que o caminho que a **nossa tela** usa é o caminho que você limitou — não confie,
-  verifique batendo pela tela e olhando a tabela.
-
-- **Pitfall 3:** se `customStorage` estiver configurado, ele ganha de `storage: "database"`
-  silenciosamente. Não configure os dois.
-
-- **Honestidade no comentário:** rate limit por IP é atrito, não barreira. IP é compartilhado
-  (operadora, NAT) e trocável (proxy residencial, botnet). Registre o que ele não resolve;
-  quem resolve o resto é a Feature 2 (Turnstile e senha vazada).
+- [x] Depois da janela, volta a aceitar.
+- [x] O limite global (mais folgado) continua valendo nas outras rotas de `/api/auth`.
+- [x] Está registrado se você manteve 3/10s ou trocou, **com a conta que justifica**.
+- [x] Navegar normalmente na loja **não** dispara 429.
+- [x] `pnpm lint`, `pnpm typecheck` e `pnpm build` passam.
 
 ## Comments
+
+### 2026-10-02 — Claude
+
+**O que mudou:** model `RateLimit` (gerado pela CLI com o mesmo config descartável do
+ticket 04, agora com `rateLimit: { storage: "database" }`), a migration `rate_limit` e o
+bloco `rateLimit` em `src/server/auth.ts`.
+
+**A migration tem RLS escrito à mão**, como a `auth_tables`. Nesta tabela o ataque é
+específico: pela API REST do Supabase, quem tivesse a chave `anon` leria os IPs de quem
+tentou entrar e, pior, **apagaria a própria linha para zerar o contador**. Conferido depois
+de aplicar: `relrowsecurity = true` e só `postgres` tem privilégio na tabela (os
+`DEFAULT PRIVILEGES` da `lock_down_data_api` funcionaram para a tabela nova).
+
+**Correção ao ticket 04:** lá está escrito que o `migrate dev` "roda o `generate`". **No
+Prisma 7 não roda mais.** Sintoma: a migration aplicada, a tabela no banco, e toda rota de
+auth respondendo 500 com `SCHEMA_MISMATCH: missing-table rateLimit`, porque o better-auth
+compara com o client **gerado**, que não tinha o model. Remédio: `pnpm db:generate` depois
+de toda migration (e reiniciar o `next dev`).
+
+**Como o better-auth conta (lido em `api/rate-limiter`, v1.7.6):**
+
+- Chave `${ip}|${caminho}`. Linha por chave, com `count` e `lastRequest` (ms).
+- A janela começa na **última tentativa aceita**, não num relógio fixo: enquanto as
+  tentativas vêm com menos de `window` segundos entre elas, `count` sobe; ao chegar em
+  `max`, recusa até passarem `window` segundos da última aceita. Não é janela fixa (não
+  existe o efeito de borda "3 no segundo 9 + 3 no segundo 11") nem janela deslizante.
+- A tentativa **recusada não grava nada**: o bloqueio não se estica. Visto no teste, o
+  `X-Retry-After` desce 10 → 9 → 8 enquanto as recusas continuam.
+- O incremento é um UPDATE condicional (`where count < max`), então é atômico.
+- Linhas velhas se apagam sozinhas quando algum contador recomeça (corte = a maior janela
+  configurada, hoje 60s, de uma regra embutida da Feature 2).
+
+**Testes (`next dev`, contados):**
+
+| Teste | Resultado |
+|---|---|
+| 6 logins errados seguidos | 401, 401, 401, 429 (`X-Retry-After: 10`), 429 (9), 429 (8) |
+| Tabela depois | `0000:…:0000\|/sign-in/email`, `count = 3` (`::1` agrupado pelo prefixo /64) |
+| Depois de 10s | 401 de novo, contador recomeça |
+| 20 logins **em paralelo** | exatamente 3 × 401 e 17 × 429 |
+| 110 `GET /get-session` em paralelo (20 por vez) | exatamente 100 × 200 e 10 × 429 |
+| Navegar em `/`, `/entrar`, `/cadastro`, `/conta`, `/admin`, `/design-system` (3× cada) | nenhuma linha na tabela, nenhum 429 |
+
+Navegar não conta porque a sessão das páginas é lida no servidor por `auth.api.getSession`,
+que não passa pelo roteador HTTP. Os paralelos são a prova de que o contador é atômico: com
+"ler, decidir, gravar" separado, vários passariam por terem lido o mesmo número.
+
+**Como provar que está no banco sem confiar no config:** apagar as linhas, bater no
+endpoint e ver a linha aparecer com o `count` certo. Em memória o 429 aconteceria do mesmo
+jeito localmente, e só a tabela diferencia os dois.
+
+**Decisão: manter 3 por 10s (regra embutida) no login e no cadastro. Sem `customRules`.**
+
+| | 3 / 10s (mantido) | 10 / 60s (alternativa) |
+|---|---|---|
+| Teto por IP | 18/min, 1080/h | 10/min, 600/h |
+| Lista de 10 mil senhas, 1 IP | ~9,3 h | ~16,7 h |
+| Mesma lista, 100 IPs | ~5,6 min | ~10 min |
+| Pessoa que erra rápido | 4ª tentativa em <10s espera **até 10s** | quase nunca bloqueia, mas quando bloqueia espera **até 60s** |
+| Muita gente atrás do mesmo IP (operadora, NAT) | 18 logins/min sustentados | 10/min: bloqueia antes |
+
+A conta que decide: entre as duas opções a diferença contra o atacante é **menos de 2×**,
+enquanto o ataque distribuído (100 IPs) muda o resultado em **100×**. Ou seja, o número
+não é onde mora a segurança contra o atacante sério; o que muda isso é a Feature 2
+(Turnstile cobra custo por tentativa, independente de IP). Então o critério vira a pessoa
+legítima e o IP compartilhado, e a 3/10s ganha nos dois: espera curta e mais vazão
+sustentada. De brinde, zero código nosso, e a regra embutida já cobre `/change-password` e
+`/change-email`, que chegam na Feature 2. O 429 já tem mensagem em pt-BR desde o ticket 07.
+
+O padrão global (10s / 100) ficou escrito no config com os valores do código: a doc diz
+60s, e escrever protege de mudar por baixo numa atualização.
+
+**Achado de segurança: de onde vem o IP.** Lido em `@better-auth/core/utils/ip`: o IP sai
+do `x-forwarded-for` e só se ele tiver **um** valor (com vários, o primeiro é o que o
+cliente pode ter inventado, e a biblioteca não escolhe). Testado:
+
+- `next dev` **repassa o header do cliente sem mexer**: com `X-Forwarded-For: 203.0.113.7`
+  a chave virou `203.0.113.7|/sign-in/email`. Em dev, trocar o header a cada requisição
+  escapa do limite.
+- Com dois valores, em dev cai em `127.0.0.1`. Em produção cairia em `no-trusted-ip`, uma
+  chave só para a loja inteira: 3 logins a cada 10s **para todo mundo**, um jeito de
+  derrubar o login.
+
+Em produção a segurança depende de a Vercel sobrescrever o header. A doc dela diz que sim,
+mas isso só se prova lá: virou critério de aceite do ticket 15, com o plano B escrito.
+
+**O que o rate limit NÃO resolve** (registrado no comentário do config): a chave é por IP,
+e IP é compartilhado e trocável. É atrito, não barreira. Contar por e-mail continua adiado
+para a Feature 2 (nota no roadmap), para ser comparado com o Turnstile.
+
+**Para destravar a si mesmo em dev:** `DELETE FROM "rateLimit";` (ou apagar as linhas no
+`pnpm db:studio`).
