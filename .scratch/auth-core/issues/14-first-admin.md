@@ -24,8 +24,8 @@ segunda senha, sem rate limit e sem hash. Criar Admin é tarefa de operador.
 
 - [x] Existe um comando documentado que promove um Admin, e ele funcionou:
       `pnpm admin:promote <email>`.
-- [ ] O seu usuário existe no banco com `role: "admin"` e você consegue abrir `/admin`.
-      **Gustavo roda** (é a conta dele e a confirmação é interativa).
+- [x] O seu usuário existe no banco com `role: "admin"` e você consegue abrir `/admin`.
+      Gustavo rodou para `gustavopp.dev@gmail.com`; conferido no banco: `role: admin`, `banned: false`, Admin único.
 - [x] O caminho escolhido **não** é alcançável por HTTP: não é rota, não é server action.
 - [x] Rodar duas vezes não estraga nada (idempotente ou falha com mensagem clara).
 - [x] Nenhuma senha em texto puro ficou em arquivo versionado nem no histórico do shell.
@@ -92,6 +92,5 @@ apagado no fim):
 | Rodar de novo | `já é Admin. Nada a fazer.`, saída 0, nada gravado |
 | Conta bloqueada | recusada, saída 1 |
 
-**Falta:** Gustavo rodar para a conta dele (`gustavopp.dev@gmail.com`, hoje `role: user`)
-e abrir `/admin`. Em produção é o mesmo banco (ver ticket 04), então isso já vale para o
-ticket 15.
+**Feito:** Gustavo promoveu a própria conta (`gustavopp.dev@gmail.com`) e abriu `/admin`.
+Em produção é o mesmo banco (ver ticket 04), então isso já vale para o ticket 15.
