@@ -5,7 +5,7 @@ Cada feature é entregável sozinha e vai para produção (Vercel) ao terminar. 
 | # | Feature | Slug | Aprendizado principal | Status |
 |---|---|---|---|---|
 | 0 | Fundação | `foundation` | Next 16, pnpm, Biome, shadcn + direção visual, Prisma + Supabase, env com Zod, error/loading/not-found, padrão de resultado das actions, toasts, headers de segurança, Vitest, deploy | **concluída** — https://grafite-five.vercel.app |
-| 1 | Auth: essencial | `auth-core` | better-auth, cadastro/login/logout, plugin admin (papéis `user`/`admin`), primeiro Admin fora da interface, `proxy.ts`, `requireUser`/`requireAdmin`, rate limit (no banco, mais rígido em rotas sensíveis), proteção de open redirect | **em andamento** (spec e 16 tickets escritos) |
+| 1 | Auth: essencial | `auth-core` | better-auth, cadastro/login/logout, plugin admin (papéis `user`/`admin`), primeiro Admin fora da interface, `proxy.ts`, `requireUser`/`requireAdmin`, rate limit (no banco, mais rígido em rotas sensíveis), proteção de open redirect | **em andamento** (spec e 17 tickets escritos) |
 | 2 | Auth: segurança da conta | `auth-hardening` | Resend + React Email, verificação de e-mail, recuperação de senha, senhas vazadas (HIBP), Turnstile, sessões ativas, derrubar sessões ao trocar senha | pendente |
 | 3 | Admin: Categorias e Produtos | `admin-catalog` | CRUD, RHF + Zod, Slug, arquivamento, tabela paginada, seed | pendente |
 | 4 | Imagens de Produto | `product-images` | Upload no Admin, storage (Supabase Storage), validação do tipo REAL do arquivo, limite de tamanho, URL assinada, `next/image` | pendente |
@@ -57,6 +57,14 @@ nenhum fora tem.
 
 ## Decisões transversais
 
+- **Projeto de portfólio** (decidido em 2026-10-02): repositório público, loja de
+  demonstração que nunca vende nem cobra de verdade. A segurança continua sendo feita como
+  se fosse real (é a vitrine), mas gateway de pagamento, bancos separados de dev/prod e
+  processo completo de LGPD ficam de fora. Como visitantes vão criar conta, o cadastro avisa
+  que é demonstração (ticket 15 de `auth-core`).
+- **Fim de cada feature: doc de estudo → tag `estudo/<feature>` → dieta de comentários.** A
+  `main` fica com comentários curtos de projeto profissional; a versão comentada fica na tag
+  e no doc (`~/Documentos/grafite-estudo/`). Ver AGENTS.md.
 - Glossário: `CONTEXT.md`. Decisões: `docs/adr/`.
 - Stack: Next.js 16, TypeScript strict, pnpm, Biome, shadcn/ui, Prisma + Supabase (só Postgres), better-auth, Zod, react-hook-form, nuqs, Resend, Vitest, Playwright.
 - Código e glossário em inglês; UI em pt-BR.

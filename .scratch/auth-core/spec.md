@@ -440,3 +440,4 @@ As duas alternativas, escritas aqui para a Feature 5 não redescobrir o problema
 | 14 | Primeiro Admin | ~~Gustavo~~ Claude | 04, 09 |
 | 15 | Deploy na Vercel com autenticação | ~~Gustavo~~ Claude | 01-14 |
 | 16 | Doc de estudo da feature | ~~Gustavo~~ Claude | 15 |
+| 17 | Tag de estudo e dieta de comentários | Claude | 16 |

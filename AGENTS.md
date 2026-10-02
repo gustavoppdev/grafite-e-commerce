@@ -26,13 +26,29 @@ abandoned past projects mid-way, so momentum beats exercises. Since 2026-10-01:
   Wait for him before starting the next ticket.
 - Record each ticket's decisions in its `## Comments`: they are the raw material for the
   study doc.
-- Code keeps short explanatory comments in pt-BR that explain *why*, not *what*.
+- Code keeps explanatory comments in pt-BR that explain *why*, not *what* (trimmed at the
+  end of the feature, see below).
 - **At the end of each feature**, write the feature study doc in the format of the
   Foundation one (`~/Documentos/grafite-estudo/`: a README + one chapter per topic; each
   chapter = concept from scratch → how GRAFITE does it → pitfalls). Gustavo will later
   rebuild each feature as an isolated study project (one per module: foundation, auth, ...),
   so the doc must stand on its own as a guide for that.
+- **Then close the feature with a comment diet** (its own last ticket; decided 2026-10-02):
+  1. tag the commented version: `git tag estudo/<feature-slug>` (pushed), so
+     `git checkout estudo/<feature-slug>` always shows the study version;
+  2. one commit that trims the code comments to short *why* lines (one or two lines,
+     non-obvious decisions and security reasons). The long explanations now live in the
+     study doc and in the tag. Tickets, specs and ADRs are not trimmed.
+  During a feature nothing changes: code is written with full explanatory comments for
+  Gustavo's review.
 - Add missing security measures proactively.
+
+## Portfolio project
+
+GRAFITE is a **portfolio piece**: a public repo and a demo store that never sells anything
+and never takes real payments. Security is still built as if it were real (that is the
+showcase), but real-business concerns (payment gateway, separate dev/prod databases, full
+LGPD process) are out of scope unless Gustavo asks.
 
 ## Resuming work
 
